@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <title>TikTok Live - stasiuxqlives</title>
+    <style>
+        body { margin: 0; font-family: 'Arial', sans-serif; background: black; color: white; overflow: hidden; height: 100vh; display: flex; flex-direction: column; }
+        
+        /* 1. TŁO WIDEO - POTĘŻNE I WYŚRODKOWANE */
+        #media-container { 
+            flex-grow: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+            background: #000;
+        }
+        
+        video { 
+            width: 95%; 
+            height: 85%; 
+            object-fit: cover; 
+            border: 4px solid #00f2ea; 
+            border-radius: 20px; 
+            box-shadow: 0 0 40px rgba(0, 242, 234, 0.4);
+        }
+
+        /* 2. WIDOK UŻYTKOWNIKA (FORMULARZ) */
+        #user-view { 
+            position: absolute; 
+            top: 50%; 
+            left: 50%; 
+            transform: translate(-50%, -50%); 
+            background: rgba(0,0,0,0.85); 
+            padding: 30px; 
+            border-radius: 20px; 
+            border: 3px solid #ff0050; 
+            z-index: 10; 
+            text-align: center; 
+            width: 350px; 
+            box-shadow: 0 0 30px #ff0050; 
+        }
+        
+        input { padding: 12px; width: 90%; margin: 15px 0; border-radius: 8px; border: none; font-size: 16px; color: #000; }
+        #submit-btn { padding: 12px 25px; background: #ff0050; color: white; border: none; cursor: pointer; font-weight: bold; border-radius: 8px; width: 100%; font-size: 18px; }
+
+        /* 3. PANEL ADMINA */
+        #admin-view { 
+            display: none; 
+            position: absolute; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            background: #0a0a0a; 
+            z-index: 100; 
+            overflow-y: auto; 
+            padding: 40px; 
+            box-sizing: border-box; 
+        }
+        .entry { background: #1a1a1a; padding: 20px; margin-bottom: 15px; border-left: 8px solid #ff0050; display: flex; justify-content: space-between; align-items: center; border-radius: 10px; }
+        .add-btn { background: #00f2ea; color: black; padding: 10px 20px; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; text-decoration: none; }
+        .delete-btn { background: #555; color: white; padding: 10px; border: none; border-radius: 5px; cursor: pointer; margin-left: 10px; }
+
+        /* 4. DODATKI LIVE */
+        .follow-badge { position: absolute; top: 20px; left: 20px; background: #ff0050; padding: 10px 20px; border-radius: 50px; font-weight: bold; z-index: 5; animation: pulse 2s infinite; }
+        .ticker-wrap { width: 100%; background: #000; border-top: 3px solid #00f2ea; padding: 15px 0; z-index: 5; overflow: hidden; white-space: nowrap; }
+        .ticker-move { display: inline-block; animation: ticker 25s linear infinite; }
+        .ticker-item { display: inline-block; color: white; font-size: 24px; font-weight: bold; margin-right: 100px; }
+
+        @keyframes ticker { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
+    </style>
+</head>
+<body>
+
+    <div class="follow-badge">@stasiuxqlives</div>
+
+    <div id="media-container">
+        <video autoplay loop muted>
+            <source src="VIDEO-2026-04-24-14-52-28" type="VIDEO-2026-04-24-14-52-28">
+            Twoja przeglądarka nie obsługuje wideo.
+        </video>
+    </div>
+
+    <div id="user-view">
+        <h2 style="color:#00f2ea; margin-top:0;">PROMO ROBLOX</h2>
+        <p>Zostaw <b>FOLLOW</b> i podaj nick:</p>
+        <input type="text" id="robloxNick" placeholder="Twój Username (nie Display!)">
+        <button id="submit-btn">WYŚLIJ ZGŁOSZENIE 🚀</button>
+    </div>
+
+    <div id="admin-view">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <h1 style="color:#ff0050;">PANEL MODERACJI (ADMIN)</h1>
+            <button onclick="location.href=location.pathname" style="padding:10px; cursor:pointer;">UKRYJ PANEL</button>
+        </div>
+        <hr border="1" color="#333">
+        <div id="list"></div>
+    </div>
+
+    <div class="ticker-wrap">
+        <div class="ticker-move">
+            <div class="ticker-item">ZAPRASZAM NA <span style="color:#ff0050;">TWOJE PROMO</span>! 🔥</div>
+            <div class="ticker-item">OBSERWUJ <span style="color:#00f2ea;">@stasiuxqlives</span> 🚀</div>
+            <div class="ticker-item">DZIĘKI ZA PREZENTY! 🎁</div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
+        import { getDatabase, ref, push, onValue, remove } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-database.js";
+
+        // TWOJA KONFIGURACJA Z POPRZEDNIEJ WIADOMOŚCI
+        const firebaseConfig = {
+            apiKey: "AIzaSyCsJAHVng7Nz5U68XgiPBdGAu4OfoStlWE",
+            authDomain: "live-9ec8b.firebaseapp.com",
+            databaseURL: "https://live-9ec8b-default-rtdb.europe-west1.firebasedatabase.app",
+            projectId: "live-9ec8b",
+            storageBucket: "live-9ec8b.firebasestorage.app",
+            messagingSenderId: "735320103033",
+            appId: "1:735320103033:web:5962bf2fba5d5a6b299ca8",
+            measurementId: "G-3H4D8YQE30"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        // FORMULARZ
+        const submitBtn = document.getElementById('submit-btn');
+        submitBtn.addEventListener('click', () => {
+            const nick = document.getElementById('robloxNick').value;
+            if(nick.trim() !== "") {
+                push(ref(db, 'zgloszenia'), {
+                    username: nick,
+                    timestamp: Date.now()
+                }).then(() => {
+                    alert("Zgłoszono pomyślnie!");
+                    document.getElementById('robloxNick').value = "";
+                });
+            }
+        });
+
+        // TRYB ADMINA
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('mode') === 'admin') {
+            document.getElementById('admin-view').style.display = 'block';
+            document.getElementById('user-view').style.display = 'none';
+
+            onValue(ref(db, 'zgloszenia'), (snapshot) => {
+                const listDiv = document.getElementById('list');
+                listDiv.innerHTML = "";
+                snapshot.forEach((child) => {
+                    const data = child.val();
+                    const key = child.key;
+                    const item = document.createElement('div');
+                    item.className = 'entry';
+                    item.innerHTML = `
+                        <span>👤 <b>${data.username}</b></span>
+                        <div>
+                            <a href="https://www.roblox.com/users/profile?username=${data.username}" target="_blank" class="add-btn">DODAJ</a>
+                            <button class="delete-btn" id="del-${key}">USUŃ</button>
+                        </div>
+                    `;
+                    listDiv.appendChild(item);
+                    document.getElementById(`del-${key}`).addEventListener('click', () => {
+                        remove(ref(db, 'zgloszenia/' + key));
+                    });
+                });
+            });
+        }
+    </script>
+</body>
+</html>
