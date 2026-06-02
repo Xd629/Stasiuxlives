@@ -56,6 +56,12 @@ button{
     color:white;
 }
 
+.logout-btn{
+    background:#64748b;
+    color:white;
+    margin-left:8px;
+}
+
 .upload-btn{
     background:#22c55e;
     color:white;
@@ -67,6 +73,31 @@ button{
     color:white;
     width:100%;
     margin-top:8px;
+}
+
+button:disabled{
+    opacity:.6;
+    cursor:not-allowed;
+}
+
+.message{
+    margin-top:12px;
+    line-height:1.4;
+}
+
+.message.success{
+    color:#86efac;
+}
+
+.message.error{
+    color:#fca5a5;
+}
+
+.photo-meta,
+.empty{
+    padding:10px;
+    color:#d1d5db;
+    font-size:14px;
 }
 
 .gallery{
@@ -125,6 +156,7 @@ button{
 
     <div class="card">
         <button id="loginBtn" class="login-btn">Zaloguj przez Google</button>
+        <button id="logoutBtn" class="logout-btn" style="display:none;">Wyloguj</button>
         <div id="userBox"></div>
 
         <div id="uploadBox" style="display:none;">
@@ -146,134 +178,278 @@ button{
 </div>
 
 <script type="module">
-
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-app.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-app.js";
 import {
   getAuth,
   GoogleAuthProvider,
+  signInWithPopup,
   signInWithRedirect,
+  signOut,
   getRedirectResult,
   onAuthStateChanged
-} from "https://www.gstatic.com/firebasejs/12.14.0/firebase-auth.js";
-
+} from "https://www.gstatic.com/firebasejs/12.7.0/firebase-auth.js";
 import {
   getFirestore,
   collection,
   addDoc,
   deleteDoc,
   doc,
-  onSnapshot
-} from "https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js";
+  onSnapshot,
+  orderBy,
+  query
+} from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
 
-
-// 🔥 TWOJA KONFIGURACJA
+// Konfiguracja Firebase dla projektu rbxmhub.
 const firebaseConfig = {
-    apiKey: "AIzaSyBDstk_UwkFTGQyiehAXlxaII",
+    apiKey: "AIzaSyBDstk_UwkFTGqQyiehAXjMvnElxclxaII",
     authDomain: "rbxmhub.firebaseapp.com",
     projectId: "rbxmhub",
-    storageBucket: "rbxmhub.firebasestorage.com",
+    storageBucket: "rbxmhub.appspot.com",
     messagingSenderId: "398660647763",
-    appId: "1:398660647763:web:c13468a82fe-36947603fa6"
+    appId: "1:398660647763:web:c13468a82fe36947603fa6"
 };
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 const provider = new GoogleAuthProvider();
+const ADMIN_EMAIL = "playstationsony106@gmail.com";
 
 const loginBtn = document.getElementById("loginBtn");
+const logoutBtn = document.getElementById("logoutBtn");
+const uploadBtn = document.getElementById("uploadBtn");
+const fileInput = document.getElementById("fileInput");
 const uploadBox = document.getElementById("uploadBox");
 const userBox = document.getElementById("userBox");
 const gallery = document.getElementById("gallery");
+const viewer = document.getElementById("viewer");
+const viewerImg = document.getElementById("viewerImg");
 
-// 🔥 LOGIN (NAPRAWIONE)
-loginBtn.addEventListener("click", () => {
-    signInWithRedirect(auth, provider);
-});
+let unsubscribeGallery = null;
 
-getRedirectResult(auth).catch(console.error);
+function showMessage(text, type = "info") {
+    userBox.textContent = text;
+    userBox.className = `message ${type}`;
+}
 
-// 🔥 USER STATE
-onAuthStateChanged(auth, user => {
-    if(user){
-        userBox.textContent = "Zalogowano jako: " + user.displayName;
-        uploadBox.style.display = "block";
-        loadGallery();
+function showError(error) {
+    console.error(error);
+    const details = error?.message ? ` (${error.message})` : "";
+    showMessage(`Błąd: ${details}`, "error");
+}
+
+function isAdmin(user) {
+    return user?.email?.toLowerCase() === ADMIN_EMAIL;
+}
+
+logoutBtn.addEventListener("click", async () => {
+    logoutBtn.disabled = true;
+    showMessage("Wylogowywanie...", "info");
+
+    try {
+        await signOut(auth);
+        showMessage("Wylogowano.", "success");
+    } catch (error) {
+        showError(error);
+    } finally {
+        logoutBtn.disabled = false;
     }
 });
 
-// 🔥 base64 image
-function toBase64(file){
-    return new Promise((res,rej)=>{
+loginBtn.addEventListener("click", async () => {
+    loginBtn.disabled = true;
+    showMessage("Logowanie...", "info");
+
+    try {
+        await signInWithPopup(auth, provider);
+    } catch (error) {
+        // Popup może być blokowany przez przeglądarkę, więc wtedy używamy redirectu.
+        if (error?.code === "auth/popup-blocked" || error?.code === "auth/cancelled-popup-request") {
+            await signInWithRedirect(auth, provider);
+            return;
+        }
+
+        showError(error);
+        loginBtn.disabled = false;
+    }
+});
+
+getRedirectResult(auth).catch(showError);
+
+onAuthStateChanged(auth, user => {
+    if (user) {
+        const admin = isAdmin(user);
+
+        loginBtn.style.display = "none";
+        logoutBtn.style.display = "inline-block";
+        uploadBox.style.display = admin ? "block" : "none";
+        showMessage(
+            admin
+                ? `Zalogowano jako admin: ${user.displayName || user.email}`
+                : `Zalogowano jako: ${user.displayName || user.email}. Możesz oglądać zdjęcia, ale tylko ${ADMIN_EMAIL} może dodawać i usuwać.`,
+            admin ? "success" : "info"
+        );
+        loadGallery();
+        return;
+    }
+
+    loginBtn.disabled = false;
+    loginBtn.style.display = "inline-block";
+    logoutBtn.disabled = false;
+    logoutBtn.style.display = "none";
+    uploadBox.style.display = "none";
+    gallery.innerHTML = "";
+    showMessage("Zaloguj się, aby dodawać i usuwać zdjęcia.", "info");
+
+    if (unsubscribeGallery) {
+        unsubscribeGallery();
+        unsubscribeGallery = null;
+    }
+});
+
+function imageToBase64(file) {
+    return new Promise((resolve, reject) => {
+        if (!file.type.startsWith("image/")) {
+            reject(new Error("Wybierz plik graficzny."));
+            return;
+        }
+
         const reader = new FileReader();
-        reader.onload = () => res(reader.result);
-        reader.onerror = rej;
+        reader.onload = () => {
+            const img = new Image();
+            img.onload = () => {
+                const maxSize = 1280;
+                const scale = Math.min(1, maxSize / Math.max(img.width, img.height));
+                const canvas = document.createElement("canvas");
+                canvas.width = Math.round(img.width * scale);
+                canvas.height = Math.round(img.height * scale);
+
+                const ctx = canvas.getContext("2d");
+                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                resolve(canvas.toDataURL("image/jpeg", 0.82));
+            };
+            img.onerror = () => reject(new Error("Nie udało się odczytać zdjęcia."));
+            img.src = reader.result;
+        };
+        reader.onerror = () => reject(new Error("Nie udało się odczytać pliku."));
         reader.readAsDataURL(file);
     });
 }
 
-// 🔥 upload
-document.getElementById("uploadBtn").addEventListener("click", async () => {
-    const file = document.getElementById("fileInput").files[0];
-    if(!file) return;
+uploadBtn.addEventListener("click", async () => {
+    const file = fileInput.files[0];
 
-    const base64 = await toBase64(file);
+    if (!auth.currentUser) {
+        showMessage("Najpierw zaloguj się przez Google.", "error");
+        return;
+    }
 
-    await addDoc(collection(db,"photos"),{
-        image: base64,
-        user: auth.currentUser.displayName,
-        time: Date.now()
-    });
+    if (!isAdmin(auth.currentUser)) {
+        showMessage(`Tylko ${ADMIN_EMAIL} może dodawać zdjęcia.`, "error");
+        return;
+    }
 
-    document.getElementById("fileInput").value = "";
+    if (!file) {
+        showMessage("Wybierz zdjęcie do dodania.", "error");
+        return;
+    }
+
+    uploadBtn.disabled = true;
+    showMessage("Dodawanie zdjęcia...", "info");
+
+    try {
+        const image = await imageToBase64(file);
+
+        if (image.length > 900_000) {
+            throw new Error("Zdjęcie jest za duże po kompresji. Wybierz mniejszy plik.");
+        }
+
+        await addDoc(collection(db, "photos"), {
+            image,
+            user: auth.currentUser.displayName || auth.currentUser.email,
+            uid: auth.currentUser.uid,
+            time: Date.now()
+        });
+
+        fileInput.value = "";
+        showMessage("Zdjęcie dodane.", "success");
+    } catch (error) {
+        showError(error);
+    } finally {
+        uploadBtn.disabled = false;
+    }
 });
 
-// 🔥 gallery realtime
-function loadGallery(){
-    onSnapshot(collection(db,"photos"), snap => {
+function loadGallery() {
+    if (unsubscribeGallery) return;
+
+    const photosQuery = query(collection(db, "photos"), orderBy("time", "desc"));
+
+    unsubscribeGallery = onSnapshot(photosQuery, snap => {
         gallery.innerHTML = "";
 
-        snap.forEach(d => {
-            const data = d.data();
+        if (snap.empty) {
+            gallery.innerHTML = '<p class="empty">Brak zdjęć. Dodaj pierwsze zdjęcie.</p>';
+            return;
+        }
 
+        snap.forEach(photoDoc => {
+            const data = photoDoc.data();
             const div = document.createElement("div");
             div.className = "photo";
 
-            div.innerHTML = `
-                <img src="${data.image}">
-                <button class="delete-btn">Usuń</button>
-            `;
+            const img = document.createElement("img");
+            img.src = data.image;
+            img.alt = `Zdjęcie dodane przez ${data.user || "użytkownika"}`;
+            img.addEventListener("click", () => openViewer(data.image));
 
-            div.querySelector("img").onclick = () => openViewer(data.image);
+            const meta = document.createElement("p");
+            meta.className = "photo-meta";
+            meta.textContent = data.user ? `Autor: ${data.user}` : "Autor nieznany";
 
-            div.querySelector(".delete-btn").onclick = async () => {
-                await deleteDoc(doc(db,"photos",d.id));
-            };
+            div.append(img, meta);
 
+            if (isAdmin(auth.currentUser)) {
+                const deleteBtn = document.createElement("button");
+                deleteBtn.className = "delete-btn";
+                deleteBtn.type = "button";
+                deleteBtn.textContent = "Usuń";
+                deleteBtn.addEventListener("click", async () => {
+                    if (!isAdmin(auth.currentUser)) {
+                        showMessage(`Tylko ${ADMIN_EMAIL} może usuwać zdjęcia.`, "error");
+                        return;
+                    }
+
+                    deleteBtn.disabled = true;
+                    try {
+                        await deleteDoc(doc(db, "photos", photoDoc.id));
+                    } catch (error) {
+                        showError(error);
+                        deleteBtn.disabled = false;
+                    }
+                });
+
+                div.appendChild(deleteBtn);
+            }
             gallery.appendChild(div);
         });
-    });
+    }, showError);
 }
 
-// 🔥 viewer
-const viewer = document.getElementById("viewer");
-const viewerImg = document.getElementById("viewerImg");
-
-function openViewer(img){
+function openViewer(img) {
     viewer.classList.add("active");
     viewerImg.src = img;
 }
 
-document.getElementById("close").onclick = () => {
+document.getElementById("close").addEventListener("click", () => {
     viewer.classList.remove("active");
-};
+});
 
 viewer.addEventListener("click", e => {
-    if(e.target === viewer){
+    if (e.target === viewer) {
         viewer.classList.remove("active");
     }
 });
-
 </script>
 
 </body>
