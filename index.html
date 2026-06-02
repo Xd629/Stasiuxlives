@@ -125,13 +125,18 @@ button{
 <div class="container">
 
     <div class="card">
-        <button id="loginBtn" class="login-btn">Zaloguj przez Google</button>
+        <button id="loginBtn" class="login-btn">
+            Zaloguj przez Google
+        </button>
+
         <div id="userBox"></div>
 
         <div id="uploadBox" style="display:none;">
             <input type="file" id="fileInput" accept="image/*">
             <br>
-            <button id="uploadBtn" class="upload-btn">Dodaj zdjęcie</button>
+            <button id="uploadBtn" class="upload-btn">
+                Dodaj zdjęcie
+            </button>
         </div>
     </div>
 
@@ -149,7 +154,14 @@ button{
 <script type="module">
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-app.js";
-import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged }
+
+import {
+getAuth,
+GoogleAuthProvider,
+signInWithRedirect,
+getRedirectResult,
+onAuthStateChanged
+}
 from "https://www.gstatic.com/firebasejs/12.14.0/firebase-auth.js";
 
 import {
@@ -159,17 +171,16 @@ addDoc,
 deleteDoc,
 doc,
 onSnapshot
-} from "https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js";
+}
+from "https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js";
 
-
-// 🔥 TWOJA KONFIGURACJA (wstawiona)
 const firebaseConfig = {
-    apiKey: "AIzaSyBDstk_UwkFTGQyiehAXlxaII",
-    authDomain: "rbxmhub.firebaseapp.com",
-    projectId: "rbxmhub",
-    storageBucket: "rbxmhub.firebasestorage.com",
-    messagingSenderId: "398660647763",
-    appId: "1:398660647763:web:c13468a82fe-36947603fa6"
+    apiKey: "TWOJ_KEY",
+    authDomain: "TWOJ_PROJECT.firebaseapp.com",
+    projectId: "TWOJ_PROJECT",
+    storageBucket: "TWOJ_PROJECT.appspot.com",
+    messagingSenderId: "XXXX",
+    appId: "XXXX"
 };
 
 const app = initializeApp(firebaseConfig);
@@ -182,7 +193,11 @@ const uploadBox = document.getElementById("uploadBox");
 const userBox = document.getElementById("userBox");
 const gallery = document.getElementById("gallery");
 
-loginBtn.onclick = () => signInWithPopup(auth, provider);
+loginBtn.onclick = () => {
+    signInWithRedirect(auth, provider);
+};
+
+getRedirectResult(auth).catch(console.error);
 
 onAuthStateChanged(auth, user => {
     if(user){
