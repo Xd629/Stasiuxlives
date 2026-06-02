@@ -19,7 +19,6 @@ body{
     linear-gradient(rgba(0,0,0,.75),rgba(0,0,0,.75)),
     url("https://images.unsplash.com/photo-1501785888041-af3ef285b470?q=80&w=2000&auto=format&fit=crop");
     background-size:cover;
-    background-position:center;
     color:white;
 }
 
@@ -37,7 +36,7 @@ header{
 }
 
 .card{
-    background:rgba(20,20,20,.7);
+    background:rgba(20,20,20,.75);
     border-radius:18px;
     padding:20px;
     margin-bottom:20px;
@@ -149,26 +148,25 @@ button{
 <script type="module">
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-app.js";
-
 import {
-getAuth,
-GoogleAuthProvider,
-signInWithRedirect,
-getRedirectResult,
-onAuthStateChanged
+  getAuth,
+  GoogleAuthProvider,
+  signInWithRedirect,
+  getRedirectResult,
+  onAuthStateChanged
 } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-auth.js";
 
 import {
-getFirestore,
-collection,
-addDoc,
-deleteDoc,
-doc,
-onSnapshot
+  getFirestore,
+  collection,
+  addDoc,
+  deleteDoc,
+  doc,
+  onSnapshot
 } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js";
 
 
-// 🔥 TWOJA KONFIGURACJA (wstawiona)
+// 🔥 TWOJA KONFIGURACJA
 const firebaseConfig = {
     apiKey: "AIzaSyBDstk_UwkFTGQyiehAXlxaII",
     authDomain: "rbxmhub.firebaseapp.com",
@@ -188,22 +186,23 @@ const uploadBox = document.getElementById("uploadBox");
 const userBox = document.getElementById("userBox");
 const gallery = document.getElementById("gallery");
 
-// 🔥 NAPRAWKA LOGOWANIA
-loginBtn.onclick = () => {
+// 🔥 LOGIN (NAPRAWIONE)
+loginBtn.addEventListener("click", () => {
     signInWithRedirect(auth, provider);
-};
+});
 
-// ważne — obsługa powrotu z Google
 getRedirectResult(auth).catch(console.error);
 
+// 🔥 USER STATE
 onAuthStateChanged(auth, user => {
     if(user){
-        userBox.innerHTML = "Zalogowano jako: " + user.displayName;
+        userBox.textContent = "Zalogowano jako: " + user.displayName;
         uploadBox.style.display = "block";
-        loadGalleryRealtime();
+        loadGallery();
     }
 });
 
+// 🔥 base64 image
 function toBase64(file){
     return new Promise((res,rej)=>{
         const reader = new FileReader();
@@ -213,7 +212,8 @@ function toBase64(file){
     });
 }
 
-document.getElementById("uploadBtn").onclick = async () => {
+// 🔥 upload
+document.getElementById("uploadBtn").addEventListener("click", async () => {
     const file = document.getElementById("fileInput").files[0];
     if(!file) return;
 
@@ -226,14 +226,15 @@ document.getElementById("uploadBtn").onclick = async () => {
     });
 
     document.getElementById("fileInput").value = "";
-};
+});
 
-function loadGalleryRealtime(){
+// 🔥 gallery realtime
+function loadGallery(){
     onSnapshot(collection(db,"photos"), snap => {
         gallery.innerHTML = "";
 
-        snap.forEach(docu => {
-            const data = docu.data();
+        snap.forEach(d => {
+            const data = d.data();
 
             const div = document.createElement("div");
             div.className = "photo";
@@ -246,7 +247,7 @@ function loadGalleryRealtime(){
             div.querySelector("img").onclick = () => openViewer(data.image);
 
             div.querySelector(".delete-btn").onclick = async () => {
-                await deleteDoc(doc(db,"photos",docu.id));
+                await deleteDoc(doc(db,"photos",d.id));
             };
 
             gallery.appendChild(div);
@@ -254,6 +255,7 @@ function loadGalleryRealtime(){
     });
 }
 
+// 🔥 viewer
 const viewer = document.getElementById("viewer");
 const viewerImg = document.getElementById("viewerImg");
 
@@ -266,11 +268,11 @@ document.getElementById("close").onclick = () => {
     viewer.classList.remove("active");
 };
 
-viewer.onclick = (e) => {
+viewer.addEventListener("click", e => {
     if(e.target === viewer){
         viewer.classList.remove("active");
     }
-};
+});
 
 </script>
 
