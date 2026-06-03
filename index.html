@@ -6,126 +6,483 @@
 <title>Zdjęcia - dron</title>
 
 <style>
+:root{
+    --bg:#07111f;
+    --panel:rgba(9,18,34,.72);
+    --panel-strong:rgba(12,24,45,.9);
+    --text:#f8fafc;
+    --muted:#b6c5d8;
+    --line:rgba(255,255,255,.14);
+    --accent:#38bdf8;
+    --accent-2:#8b5cf6;
+    --success:#22c55e;
+    --danger:#ef4444;
+    --warning:#f59e0b;
+    --shadow:0 24px 80px rgba(0,0,0,.45);
+}
+
 *{
     margin:0;
     padding:0;
     box-sizing:border-box;
-    font-family:Arial,sans-serif;
+    font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;
 }
 
 body{
     min-height:100vh;
     background:
-    linear-gradient(rgba(0,0,0,.75),rgba(0,0,0,.75)),
-    url("https://images.unsplash.com/photo-1501785888041-af3ef285b470?q=80&w=2000&auto=format&fit=crop");
+        radial-gradient(circle at 15% 20%, rgba(56,189,248,.32), transparent 32%),
+        radial-gradient(circle at 80% 10%, rgba(139,92,246,.28), transparent 34%),
+        linear-gradient(rgba(2,6,23,.70),rgba(2,6,23,.86)),
+        url("https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?q=80&w=2200&auto=format&fit=crop");
+    background-attachment:fixed;
+    background-position:center;
     background-size:cover;
-    color:white;
+    color:var(--text);
 }
 
-header{
-    text-align:center;
-    padding:30px;
-    font-size:28px;
-    font-weight:bold;
+body::before{
+    content:"";
+    position:fixed;
+    inset:0;
+    pointer-events:none;
+    background-image:linear-gradient(rgba(255,255,255,.04) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.04) 1px, transparent 1px);
+    background-size:48px 48px;
+    mask-image:linear-gradient(to bottom, rgba(0,0,0,.7), transparent 75%);
 }
 
-.container{
-    max-width:1100px;
-    margin:auto;
-    padding:20px;
-}
-
-.card{
-    background:rgba(20,20,20,.75);
-    border-radius:18px;
-    padding:20px;
-    margin-bottom:20px;
-    backdrop-filter:blur(10px);
+button,input,select,textarea{
+    font:inherit;
 }
 
 button{
-    padding:12px 16px;
-    border:none;
-    border-radius:10px;
+    border:0;
+}
+
+.app-shell{
+    position:relative;
+    z-index:1;
+    width:min(1180px, calc(100% - 32px));
+    margin:0 auto;
+    padding:28px 0 48px;
+}
+
+.hero{
+    min-height:330px;
+    display:grid;
+    grid-template-columns:minmax(0,1fr) 330px;
+    gap:22px;
+    align-items:stretch;
+    margin-bottom:22px;
+}
+
+.hero-main,
+.panel{
+    border:1px solid var(--line);
+    background:linear-gradient(145deg, rgba(15,23,42,.78), rgba(8,13,29,.58));
+    border-radius:30px;
+    box-shadow:var(--shadow);
+    backdrop-filter:blur(18px);
+}
+
+.hero-main{
+    position:relative;
+    overflow:hidden;
+    padding:36px;
+}
+
+.hero-main::after{
+    content:"";
+    position:absolute;
+    right:-70px;
+    bottom:-90px;
+    width:330px;
+    height:330px;
+    border-radius:999px;
+    background:radial-gradient(circle, rgba(56,189,248,.35), transparent 66%);
+}
+
+.kicker{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    padding:8px 12px;
+    border:1px solid rgba(125,211,252,.35);
+    border-radius:999px;
+    background:rgba(14,165,233,.14);
+    color:#bae6fd;
+    font-size:13px;
+    font-weight:800;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+}
+
+h1{
+    position:relative;
+    z-index:1;
+    max-width:720px;
+    margin:24px 0 14px;
+    font-size:clamp(38px,7vw,82px);
+    line-height:.92;
+    letter-spacing:-.06em;
+}
+
+.hero p{
+    position:relative;
+    z-index:1;
+    max-width:620px;
+    color:var(--muted);
+    font-size:18px;
+    line-height:1.7;
+}
+
+.hero-actions{
+    position:relative;
+    z-index:1;
+    display:flex;
+    flex-wrap:wrap;
+    gap:12px;
+    margin-top:26px;
+}
+
+.btn{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    gap:9px;
+    min-height:46px;
+    padding:12px 18px;
+    border-radius:16px;
+    color:white;
     cursor:pointer;
-    font-weight:bold;
+    font-weight:900;
+    transition:transform .18s ease, box-shadow .18s ease, opacity .18s ease;
 }
 
-.login-btn{
-    background:#4285F4;
-    color:white;
+.btn:hover:not(:disabled){
+    transform:translateY(-2px);
 }
 
-.logout-btn{
-    background:#64748b;
-    color:white;
-    margin-left:8px;
-}
-
-.upload-btn{
-    background:#22c55e;
-    color:white;
-    margin-top:10px;
-}
-
-.delete-btn{
-    background:#ef4444;
-    color:white;
-    width:100%;
-    margin-top:8px;
-}
-
-button:disabled{
-    opacity:.6;
+.btn:disabled{
+    opacity:.55;
     cursor:not-allowed;
 }
 
+.btn-primary{
+    background:linear-gradient(135deg,#38bdf8,#2563eb 48%,#8b5cf6);
+    box-shadow:0 16px 40px rgba(37,99,235,.35);
+}
+
+.btn-secondary{
+    background:rgba(148,163,184,.18);
+    border:1px solid rgba(226,232,240,.16);
+}
+
+.btn-success{
+    background:linear-gradient(135deg,#22c55e,#14b8a6);
+    box-shadow:0 16px 38px rgba(20,184,166,.24);
+}
+
+.btn-danger{
+    background:linear-gradient(135deg,#ef4444,#f97316);
+}
+
+.hero-side{
+    display:grid;
+    gap:14px;
+}
+
+.stat-card{
+    position:relative;
+    overflow:hidden;
+    padding:24px;
+    border-radius:28px;
+    border:1px solid var(--line);
+    background:rgba(15,23,42,.68);
+    backdrop-filter:blur(18px);
+    box-shadow:var(--shadow);
+}
+
+.stat-card strong{
+    display:block;
+    font-size:42px;
+    letter-spacing:-.05em;
+}
+
+.stat-card span{
+    color:var(--muted);
+    font-weight:700;
+}
+
+.panel{
+    padding:22px;
+    margin-bottom:18px;
+}
+
+.panel-title{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:14px;
+    margin-bottom:16px;
+}
+
+.panel-title h2{
+    font-size:22px;
+    letter-spacing:-.02em;
+}
+
 .message{
-    margin-top:12px;
-    line-height:1.4;
+    margin-top:14px;
+    padding:13px 15px;
+    border:1px solid rgba(148,163,184,.18);
+    border-radius:18px;
+    background:rgba(15,23,42,.58);
+    color:var(--muted);
+    line-height:1.5;
 }
 
 .message.success{
-    color:#86efac;
+    border-color:rgba(34,197,94,.35);
+    background:rgba(34,197,94,.12);
+    color:#bbf7d0;
 }
 
 .message.error{
-    color:#fca5a5;
+    border-color:rgba(239,68,68,.42);
+    background:rgba(239,68,68,.12);
+    color:#fecaca;
 }
 
-.photo-meta,
-.empty{
-    padding:10px;
-    color:#d1d5db;
+.upload-grid{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) 270px;
+    gap:16px;
+    align-items:stretch;
+}
+
+.dropzone{
+    min-height:190px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:10px;
+    padding:24px;
+    border:1px dashed rgba(125,211,252,.55);
+    border-radius:24px;
+    background:linear-gradient(145deg, rgba(14,165,233,.12), rgba(139,92,246,.10));
+    text-align:center;
+    cursor:pointer;
+    transition:border-color .18s ease, transform .18s ease, background .18s ease;
+}
+
+.dropzone:hover,
+.dropzone.dragover{
+    transform:translateY(-2px);
+    border-color:#7dd3fc;
+    background:linear-gradient(145deg, rgba(14,165,233,.20), rgba(139,92,246,.18));
+}
+
+.dropzone-icon{
+    width:62px;
+    height:62px;
+    display:grid;
+    place-items:center;
+    border-radius:22px;
+    background:rgba(255,255,255,.10);
+    font-size:28px;
+}
+
+.dropzone strong{
+    font-size:20px;
+}
+
+.dropzone span,
+.hint{
+    color:var(--muted);
     font-size:14px;
+}
+
+#fileInput{
+    display:none;
+}
+
+.upload-details{
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+}
+
+textarea,
+.search-input,
+.sort-select{
+    width:100%;
+    border:1px solid rgba(226,232,240,.14);
+    border-radius:16px;
+    background:rgba(15,23,42,.72);
+    color:var(--text);
+    outline:none;
+}
+
+textarea{
+    min-height:92px;
+    resize:vertical;
+    padding:14px;
+}
+
+.search-input,
+.sort-select{
+    min-height:46px;
+    padding:0 14px;
+}
+
+.preview-card{
+    min-height:110px;
+    display:grid;
+    grid-template-columns:88px 1fr;
+    gap:12px;
+    align-items:center;
+    padding:12px;
+    border:1px solid rgba(226,232,240,.14);
+    border-radius:18px;
+    background:rgba(15,23,42,.54);
+}
+
+.preview-card img{
+    width:88px;
+    height:88px;
+    border-radius:14px;
+    object-fit:cover;
+    background:#0f172a;
+}
+
+.preview-card strong{
+    display:block;
+    margin-bottom:4px;
+    word-break:break-word;
+}
+
+.progress{
+    height:10px;
+    overflow:hidden;
+    border-radius:999px;
+    background:rgba(148,163,184,.2);
+}
+
+.progress span{
+    display:block;
+    width:0%;
+    height:100%;
+    border-radius:inherit;
+    background:linear-gradient(90deg,#38bdf8,#22c55e);
+    transition:width .25s ease;
+}
+
+.toolbar{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) 190px 130px;
+    gap:12px;
 }
 
 .gallery{
     display:grid;
-    grid-template-columns:repeat(auto-fill,minmax(250px,1fr));
-    gap:15px;
+    grid-template-columns:repeat(auto-fill,minmax(245px,1fr));
+    gap:18px;
 }
 
 .photo{
-    background:#111;
-    border-radius:15px;
+    position:relative;
     overflow:hidden;
+    border:1px solid rgba(226,232,240,.13);
+    border-radius:24px;
+    background:rgba(15,23,42,.68);
+    box-shadow:0 18px 45px rgba(0,0,0,.24);
+    transition:transform .18s ease, border-color .18s ease;
+}
+
+.photo:hover{
+    transform:translateY(-4px);
+    border-color:rgba(125,211,252,.45);
 }
 
 .photo img{
     width:100%;
-    height:240px;
+    height:245px;
     object-fit:cover;
     cursor:pointer;
+}
+
+.photo-body{
+    padding:14px;
+}
+
+.photo-caption{
+    min-height:22px;
+    font-weight:900;
+    color:#f8fafc;
+    word-break:break-word;
+}
+
+.photo-meta{
+    display:flex;
+    justify-content:space-between;
+    gap:10px;
+    margin-top:8px;
+    color:var(--muted);
+    font-size:13px;
+}
+
+.photo-actions{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:8px;
+    padding:0 14px 14px;
+}
+
+.photo-actions.admin{
+    grid-template-columns:1fr 1fr 1fr;
+}
+
+.icon-btn{
+    min-height:40px;
+    padding:10px 12px;
+    border-radius:13px;
+    background:rgba(148,163,184,.14);
+    border:1px solid rgba(226,232,240,.12);
+    color:white;
+    cursor:pointer;
+    font-weight:900;
+}
+
+.favorite.active{
+    background:rgba(245,158,11,.22);
+    border-color:rgba(245,158,11,.42);
+    color:#fde68a;
+}
+
+.empty{
+    grid-column:1/-1;
+    min-height:220px;
+    display:grid;
+    place-items:center;
+    padding:32px;
+    border:1px dashed rgba(226,232,240,.18);
+    border-radius:26px;
+    background:rgba(15,23,42,.45);
+    color:var(--muted);
+    text-align:center;
 }
 
 .viewer{
     position:fixed;
     inset:0;
-    background:rgba(0,0,0,.95);
     display:none;
-    justify-content:center;
     align-items:center;
+    justify-content:center;
+    padding:28px;
+    background:rgba(2,6,23,.94);
+    backdrop-filter:blur(12px);
     z-index:9999;
 }
 
@@ -133,48 +490,166 @@ button:disabled{
     display:flex;
 }
 
-.viewer img{
-    max-width:95%;
-    max-height:95%;
+.viewer-card{
+    width:min(1080px,100%);
+    display:grid;
+    gap:14px;
 }
 
-.close{
-    position:absolute;
-    top:20px;
-    right:30px;
-    font-size:40px;
-    cursor:pointer;
+.viewer img{
+    width:100%;
+    max-height:78vh;
+    object-fit:contain;
+    border-radius:26px;
+    background:#020617;
+    box-shadow:var(--shadow);
+}
+
+.viewer-bar{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+}
+
+.viewer-caption{
+    color:var(--muted);
+    line-height:1.5;
+}
+
+.viewer-controls{
+    display:flex;
+    gap:8px;
+}
+
+@media (max-width:860px){
+    .hero,
+    .upload-grid,
+    .toolbar{
+        grid-template-columns:1fr;
+    }
+
+    .hero{
+        min-height:auto;
+    }
+
+    .hero-main{
+        padding:26px;
+    }
+}
+
+@media (max-width:560px){
+    .app-shell{
+        width:min(100% - 20px, 1180px);
+        padding-top:14px;
+    }
+
+    .hero-actions,
+    .viewer-bar,
+    .viewer-controls{
+        flex-direction:column;
+        align-items:stretch;
+    }
+
+    .btn,
+    .icon-btn{
+        width:100%;
+    }
 }
 </style>
 </head>
 
 <body>
-
-<header>Zdjęcia - dron 🚁</header>
-
-<div class="container">
-
-    <div class="card">
-        <button id="loginBtn" class="login-btn">Zaloguj przez Google</button>
-        <button id="logoutBtn" class="logout-btn" style="display:none;">Wyloguj</button>
-        <div id="userBox"></div>
-
-        <div id="uploadBox" style="display:none;">
-            <input type="file" id="fileInput" accept="image/*">
-            <br>
-            <button id="uploadBtn" class="upload-btn">Dodaj zdjęcie</button>
+<div class="app-shell">
+    <section class="hero">
+        <div class="hero-main">
+            <span class="kicker">🚁 Galeria lotów</span>
+            <h1>Zdjęcia z drona</h1>
+            <p>Elegancka galeria z podglądem pełnoekranowym, wyszukiwaniem, ulubionymi zdjęciami i szybkim dodawaniem ujęć.</p>
+            <div class="hero-actions">
+                <button id="loginBtn" class="btn btn-primary" type="button">Zaloguj przez Google</button>
+                <button id="logoutBtn" class="btn btn-secondary" type="button" style="display:none;">Wyloguj</button>
+            </div>
+            <div id="userBox" class="message">Zaloguj się, aby zobaczyć galerię.</div>
         </div>
-    </div>
 
-    <div class="card">
-        <div class="gallery" id="gallery"></div>
-    </div>
+        <aside class="hero-side">
+            <div class="stat-card">
+                <strong id="photoCount">0</strong>
+                <span>zdjęć w galerii</span>
+            </div>
+            <div class="stat-card">
+                <strong id="favoriteCount">0</strong>
+                <span>ulubionych lokalnie</span>
+            </div>
+            <div class="stat-card">
+                <strong id="accountMode">Gość</strong>
+                <span>aktualny tryb</span>
+            </div>
+        </aside>
+    </section>
 
+    <section id="uploadBox" class="panel" style="display:none;">
+        <div class="panel-title">
+            <h2>Dodaj nowe ujęcie</h2>
+            <span class="hint">Przeciągnij zdjęcie albo kliknij pole wyboru</span>
+        </div>
+        <div class="upload-grid">
+            <label id="dropzone" class="dropzone" for="fileInput">
+                <span class="dropzone-icon">📷</span>
+                <strong>Wybierz lub upuść zdjęcie</strong>
+                <span>Automatycznie zmniejszę i skompresuję plik przed dodaniem.</span>
+                <input type="file" id="fileInput" accept="image/*">
+            </label>
+
+            <div class="upload-details">
+                <div id="previewCard" class="preview-card">
+                    <img id="previewImg" alt="Podgląd zdjęcia">
+                    <div>
+                        <strong id="fileName">Brak wybranego pliku</strong>
+                        <span id="fileSize" class="hint">Wybierz zdjęcie, aby zobaczyć podgląd.</span>
+                    </div>
+                </div>
+                <textarea id="captionInput" maxlength="120" placeholder="Opcjonalny opis zdjęcia, np. Zachód słońca nad jeziorem"></textarea>
+                <div class="progress" aria-label="Postęp dodawania"><span id="uploadProgress"></span></div>
+                <button id="uploadBtn" class="btn btn-success" type="button">Dodaj zdjęcie</button>
+            </div>
+        </div>
+    </section>
+
+    <section class="panel">
+        <div class="panel-title">
+            <h2>Galeria</h2>
+            <span id="galleryStatus" class="hint">Gotowe do lotu</span>
+        </div>
+        <div class="toolbar">
+            <input id="searchInput" class="search-input" type="search" placeholder="Szukaj po opisie, autorze albo dacie...">
+            <select id="sortSelect" class="sort-select">
+                <option value="newest">Najnowsze</option>
+                <option value="oldest">Najstarsze</option>
+                <option value="author">Autor A-Z</option>
+                <option value="favorites">Ulubione najpierw</option>
+            </select>
+            <button id="clearFiltersBtn" class="btn btn-secondary" type="button">Wyczyść</button>
+        </div>
+    </section>
+
+    <section class="gallery" id="gallery"></section>
 </div>
 
-<div class="viewer" id="viewer">
-    <div class="close" id="close">✕</div>
-    <img id="viewerImg">
+<div class="viewer" id="viewer" aria-hidden="true">
+    <div class="viewer-card">
+        <img id="viewerImg" alt="Powiększone zdjęcie">
+        <div class="viewer-bar">
+            <p id="viewerCaption" class="viewer-caption"></p>
+            <div class="viewer-controls">
+                <button id="prevBtn" class="btn btn-secondary" type="button">← Poprzednie</button>
+                <button id="downloadBtn" class="btn btn-primary" type="button">Pobierz</button>
+                <button id="nextBtn" class="btn btn-secondary" type="button">Następne →</button>
+                <button id="close" class="btn btn-danger" type="button">Zamknij ✕</button>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script type="module">
@@ -199,7 +674,6 @@ import {
   query
 } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
 
-// Konfiguracja Firebase dla projektu rbxmhub.
 const firebaseConfig = {
     apiKey: "AIzaSyBDstk_UwkFTGqQyiehAXjMvnElxclxaII",
     authDomain: "rbxmhub.firebaseapp.com",
@@ -213,19 +687,45 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 const provider = new GoogleAuthProvider();
+provider.setCustomParameters({ prompt: "select_account" });
+
 const ADMIN_EMAIL = "playstationsony106@gmail.com";
+const MAX_IMAGE_LENGTH = 900_000;
 
 const loginBtn = document.getElementById("loginBtn");
 const logoutBtn = document.getElementById("logoutBtn");
 const uploadBtn = document.getElementById("uploadBtn");
 const fileInput = document.getElementById("fileInput");
+const captionInput = document.getElementById("captionInput");
+const dropzone = document.getElementById("dropzone");
+const previewCard = document.getElementById("previewCard");
+const previewImg = document.getElementById("previewImg");
+const fileName = document.getElementById("fileName");
+const fileSize = document.getElementById("fileSize");
+const uploadProgress = document.getElementById("uploadProgress");
 const uploadBox = document.getElementById("uploadBox");
 const userBox = document.getElementById("userBox");
 const gallery = document.getElementById("gallery");
+const galleryStatus = document.getElementById("galleryStatus");
+const photoCount = document.getElementById("photoCount");
+const favoriteCount = document.getElementById("favoriteCount");
+const accountMode = document.getElementById("accountMode");
+const searchInput = document.getElementById("searchInput");
+const sortSelect = document.getElementById("sortSelect");
+const clearFiltersBtn = document.getElementById("clearFiltersBtn");
 const viewer = document.getElementById("viewer");
 const viewerImg = document.getElementById("viewerImg");
+const viewerCaption = document.getElementById("viewerCaption");
+const prevBtn = document.getElementById("prevBtn");
+const nextBtn = document.getElementById("nextBtn");
+const downloadBtn = document.getElementById("downloadBtn");
 
 let unsubscribeGallery = null;
+let selectedFile = null;
+let allPhotos = [];
+let visiblePhotos = [];
+let currentPhotoIndex = 0;
+let favorites = new Set(JSON.parse(localStorage.getItem("droneFavorites") || "[]"));
 
 function showMessage(text, type = "info") {
     userBox.textContent = text;
@@ -234,78 +734,81 @@ function showMessage(text, type = "info") {
 
 function showError(error) {
     console.error(error);
-    const details = error?.message ? ` (${error.message})` : "";
-    showMessage(`Błąd: ${details}`, "error");
+    const message = error?.message || "Coś poszło nie tak. Spróbuj ponownie.";
+    showMessage(`Błąd: ${message}`, "error");
+}
+
+function getUserEmail(user) {
+    const providerEmail = user?.providerData?.find(profile => profile.email)?.email;
+    return (user?.email || providerEmail || "").trim().toLowerCase();
 }
 
 function isAdmin(user) {
-    return user?.email?.toLowerCase() === ADMIN_EMAIL;
+    return getUserEmail(user) === ADMIN_EMAIL;
 }
 
-logoutBtn.addEventListener("click", async () => {
-    logoutBtn.disabled = true;
-    showMessage("Wylogowywanie...", "info");
+function formatBytes(bytes = 0) {
+    if (!bytes) return "0 KB";
+    const units = ["B", "KB", "MB", "GB"];
+    let size = bytes;
+    let index = 0;
 
-    try {
-        await signOut(auth);
-        showMessage("Wylogowano.", "success");
-    } catch (error) {
-        showError(error);
-    } finally {
-        logoutBtn.disabled = false;
+    while (size >= 1024 && index < units.length - 1) {
+        size /= 1024;
+        index += 1;
     }
-});
 
-loginBtn.addEventListener("click", async () => {
-    loginBtn.disabled = true;
-    showMessage("Logowanie...", "info");
+    return `${size.toFixed(size >= 10 || index === 0 ? 0 : 1)} ${units[index]}`;
+}
 
-    try {
-        await signInWithPopup(auth, provider);
-    } catch (error) {
-        // Popup może być blokowany przez przeglądarkę, więc wtedy używamy redirectu.
-        if (error?.code === "auth/popup-blocked" || error?.code === "auth/cancelled-popup-request") {
-            await signInWithRedirect(auth, provider);
-            return;
-        }
+function formatDate(time) {
+    if (!time) return "bez daty";
+    return new Intl.DateTimeFormat("pl-PL", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit"
+    }).format(new Date(time));
+}
 
-        showError(error);
-        loginBtn.disabled = false;
-    }
-});
+function setProgress(percent) {
+    uploadProgress.style.width = `${Math.max(0, Math.min(100, percent))}%`;
+}
 
-getRedirectResult(auth).catch(showError);
+function saveFavorites() {
+    localStorage.setItem("droneFavorites", JSON.stringify([...favorites]));
+    favoriteCount.textContent = favorites.size;
+}
 
-onAuthStateChanged(auth, user => {
-    if (user) {
-        const admin = isAdmin(user);
+function resetSelectedFile() {
+    selectedFile = null;
+    fileInput.value = "";
+    previewImg.removeAttribute("src");
+    fileName.textContent = "Brak wybranego pliku";
+    fileSize.textContent = "Wybierz zdjęcie, aby zobaczyć podgląd.";
+    previewCard.classList.remove("active");
+    setProgress(0);
+}
 
-        loginBtn.style.display = "none";
-        logoutBtn.style.display = "inline-block";
-        uploadBox.style.display = admin ? "block" : "none";
-        showMessage(
-            admin
-                ? `Zalogowano jako admin: ${user.displayName || user.email}`
-                : `Zalogowano jako: ${user.displayName || user.email}. Możesz oglądać zdjęcia, ale tylko ${ADMIN_EMAIL} może dodawać i usuwać.`,
-            admin ? "success" : "info"
-        );
-        loadGallery();
+function setSelectedFile(file) {
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+        showMessage("Wybierz plik graficzny.", "error");
         return;
     }
 
-    loginBtn.disabled = false;
-    loginBtn.style.display = "inline-block";
-    logoutBtn.disabled = false;
-    logoutBtn.style.display = "none";
-    uploadBox.style.display = "none";
-    gallery.innerHTML = "";
-    showMessage("Zaloguj się, aby dodawać i usuwać zdjęcia.", "info");
+    selectedFile = file;
+    fileName.textContent = file.name;
+    fileSize.textContent = `${formatBytes(file.size)} przed kompresją`;
 
-    if (unsubscribeGallery) {
-        unsubscribeGallery();
-        unsubscribeGallery = null;
-    }
-});
+    const reader = new FileReader();
+    reader.onload = () => {
+        previewImg.src = reader.result;
+    };
+    reader.readAsDataURL(file);
+}
 
 function imageToBase64(file) {
     return new Promise((resolve, reject) => {
@@ -318,15 +821,15 @@ function imageToBase64(file) {
         reader.onload = () => {
             const img = new Image();
             img.onload = () => {
-                const maxSize = 1280;
+                const maxSize = 1600;
                 const scale = Math.min(1, maxSize / Math.max(img.width, img.height));
                 const canvas = document.createElement("canvas");
-                canvas.width = Math.round(img.width * scale);
-                canvas.height = Math.round(img.height * scale);
+                canvas.width = Math.max(1, Math.round(img.width * scale));
+                canvas.height = Math.max(1, Math.round(img.height * scale));
 
                 const ctx = canvas.getContext("2d");
                 ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                resolve(canvas.toDataURL("image/jpeg", 0.82));
+                resolve(canvas.toDataURL("image/jpeg", 0.84));
             };
             img.onerror = () => reject(new Error("Nie udało się odczytać zdjęcia."));
             img.src = reader.result;
@@ -336,49 +839,192 @@ function imageToBase64(file) {
     });
 }
 
-uploadBtn.addEventListener("click", async () => {
-    const file = fileInput.files[0];
+async function loginWithGoogle() {
+    loginBtn.disabled = true;
+    showMessage("Otwieram logowanie Google...", "info");
 
+    try {
+        await signInWithPopup(auth, provider);
+    } catch (error) {
+        if (error?.code === "auth/popup-blocked" || error?.code === "auth/cancelled-popup-request") {
+            await signInWithRedirect(auth, provider);
+            return;
+        }
+
+        showError(error);
+        loginBtn.disabled = false;
+    }
+}
+
+async function logout() {
+    logoutBtn.disabled = true;
+    showMessage("Wylogowywanie...", "info");
+
+    try {
+        await signOut(auth);
+        showMessage("Wylogowano.", "success");
+    } catch (error) {
+        showError(error);
+    } finally {
+        logoutBtn.disabled = false;
+    }
+}
+
+async function uploadPhoto() {
     if (!auth.currentUser) {
         showMessage("Najpierw zaloguj się przez Google.", "error");
         return;
     }
 
     if (!isAdmin(auth.currentUser)) {
-        showMessage(`Tylko ${ADMIN_EMAIL} może dodawać zdjęcia.`, "error");
+        showMessage("To konto ma tryb podglądu galerii.", "info");
         return;
     }
 
-    if (!file) {
+    if (!selectedFile) {
         showMessage("Wybierz zdjęcie do dodania.", "error");
         return;
     }
 
     uploadBtn.disabled = true;
-    showMessage("Dodawanie zdjęcia...", "info");
+    setProgress(18);
+    showMessage("Przygotowuję zdjęcie...", "info");
 
     try {
-        const image = await imageToBase64(file);
+        const image = await imageToBase64(selectedFile);
+        setProgress(62);
 
-        if (image.length > 900_000) {
-            throw new Error("Zdjęcie jest za duże po kompresji. Wybierz mniejszy plik.");
+        if (image.length > MAX_IMAGE_LENGTH) {
+            throw new Error("Zdjęcie jest za duże po kompresji. Wybierz mniejszy plik albo przytnij zdjęcie.");
         }
 
         await addDoc(collection(db, "photos"), {
             image,
-            user: auth.currentUser.displayName || auth.currentUser.email,
+            caption: captionInput.value.trim(),
+            user: auth.currentUser.displayName || getUserEmail(auth.currentUser),
             uid: auth.currentUser.uid,
             time: Date.now()
         });
 
-        fileInput.value = "";
-        showMessage("Zdjęcie dodane.", "success");
+        setProgress(100);
+        captionInput.value = "";
+        resetSelectedFile();
+        showMessage("Zdjęcie dodane do galerii.", "success");
     } catch (error) {
         showError(error);
     } finally {
         uploadBtn.disabled = false;
+        setTimeout(() => setProgress(0), 900);
     }
-});
+}
+
+function getFilteredPhotos() {
+    const phrase = searchInput.value.trim().toLowerCase();
+    const filtered = allPhotos.filter(photo => {
+        const haystack = [
+            photo.caption,
+            photo.user,
+            formatDate(photo.time)
+        ].join(" ").toLowerCase();
+
+        return !phrase || haystack.includes(phrase);
+    });
+
+    return filtered.sort((a, b) => {
+        if (sortSelect.value === "oldest") return (a.time || 0) - (b.time || 0);
+        if (sortSelect.value === "author") return (a.user || "").localeCompare(b.user || "", "pl");
+        if (sortSelect.value === "favorites") return Number(favorites.has(b.id)) - Number(favorites.has(a.id)) || (b.time || 0) - (a.time || 0);
+        return (b.time || 0) - (a.time || 0);
+    });
+}
+
+function renderGallery() {
+    visiblePhotos = getFilteredPhotos();
+    gallery.innerHTML = "";
+    photoCount.textContent = allPhotos.length;
+    favoriteCount.textContent = favorites.size;
+    galleryStatus.textContent = visiblePhotos.length === 1 ? "1 zdjęcie widoczne" : `${visiblePhotos.length} zdjęć widocznych`;
+
+    if (!visiblePhotos.length) {
+        const empty = document.createElement("div");
+        empty.className = "empty";
+        empty.textContent = allPhotos.length ? "Brak zdjęć dla wybranych filtrów." : "Galeria jest pusta.";
+        gallery.appendChild(empty);
+        return;
+    }
+
+    visiblePhotos.forEach((photo, index) => {
+        const card = document.createElement("article");
+        card.className = "photo";
+
+        const img = document.createElement("img");
+        img.src = photo.image;
+        img.alt = photo.caption || `Zdjęcie dodane przez ${photo.user || "użytkownika"}`;
+        img.loading = "lazy";
+        img.addEventListener("click", () => openViewer(index));
+
+        const body = document.createElement("div");
+        body.className = "photo-body";
+
+        const caption = document.createElement("p");
+        caption.className = "photo-caption";
+        caption.textContent = photo.caption || "Ujęcie z drona";
+
+        const meta = document.createElement("div");
+        meta.className = "photo-meta";
+        const author = document.createElement("span");
+        author.textContent = photo.user || "Autor nieznany";
+        const time = document.createElement("span");
+        time.textContent = formatDate(photo.time);
+        meta.append(author, time);
+        body.append(caption, meta);
+
+        const actions = document.createElement("div");
+        actions.className = isAdmin(auth.currentUser) ? "photo-actions admin" : "photo-actions";
+
+        const favoriteBtn = document.createElement("button");
+        favoriteBtn.className = favorites.has(photo.id) ? "icon-btn favorite active" : "icon-btn favorite";
+        favoriteBtn.type = "button";
+        favoriteBtn.textContent = favorites.has(photo.id) ? "★ Ulubione" : "☆ Ulubione";
+        favoriteBtn.addEventListener("click", () => {
+            if (favorites.has(photo.id)) {
+                favorites.delete(photo.id);
+            } else {
+                favorites.add(photo.id);
+            }
+            saveFavorites();
+            renderGallery();
+        });
+
+        const downloadCardBtn = document.createElement("button");
+        downloadCardBtn.className = "icon-btn";
+        downloadCardBtn.type = "button";
+        downloadCardBtn.textContent = "Pobierz";
+        downloadCardBtn.addEventListener("click", () => downloadPhoto(photo));
+
+        actions.append(favoriteBtn, downloadCardBtn);
+
+        if (isAdmin(auth.currentUser)) {
+            const deleteBtn = document.createElement("button");
+            deleteBtn.className = "icon-btn";
+            deleteBtn.type = "button";
+            deleteBtn.textContent = "Usuń";
+            deleteBtn.addEventListener("click", async () => {
+                deleteBtn.disabled = true;
+                try {
+                    await deleteDoc(doc(db, "photos", photo.id));
+                } catch (error) {
+                    showError(error);
+                    deleteBtn.disabled = false;
+                }
+            });
+            actions.appendChild(deleteBtn);
+        }
+
+        card.append(img, body, actions);
+        gallery.appendChild(card);
+    });
+}
 
 function loadGallery() {
     if (unsubscribeGallery) return;
@@ -386,71 +1032,139 @@ function loadGallery() {
     const photosQuery = query(collection(db, "photos"), orderBy("time", "desc"));
 
     unsubscribeGallery = onSnapshot(photosQuery, snap => {
-        gallery.innerHTML = "";
-
-        if (snap.empty) {
-            gallery.innerHTML = '<p class="empty">Brak zdjęć. Dodaj pierwsze zdjęcie.</p>';
-            return;
-        }
-
-        snap.forEach(photoDoc => {
-            const data = photoDoc.data();
-            const div = document.createElement("div");
-            div.className = "photo";
-
-            const img = document.createElement("img");
-            img.src = data.image;
-            img.alt = `Zdjęcie dodane przez ${data.user || "użytkownika"}`;
-            img.addEventListener("click", () => openViewer(data.image));
-
-            const meta = document.createElement("p");
-            meta.className = "photo-meta";
-            meta.textContent = data.user ? `Autor: ${data.user}` : "Autor nieznany";
-
-            div.append(img, meta);
-
-            if (isAdmin(auth.currentUser)) {
-                const deleteBtn = document.createElement("button");
-                deleteBtn.className = "delete-btn";
-                deleteBtn.type = "button";
-                deleteBtn.textContent = "Usuń";
-                deleteBtn.addEventListener("click", async () => {
-                    if (!isAdmin(auth.currentUser)) {
-                        showMessage(`Tylko ${ADMIN_EMAIL} może usuwać zdjęcia.`, "error");
-                        return;
-                    }
-
-                    deleteBtn.disabled = true;
-                    try {
-                        await deleteDoc(doc(db, "photos", photoDoc.id));
-                    } catch (error) {
-                        showError(error);
-                        deleteBtn.disabled = false;
-                    }
-                });
-
-                div.appendChild(deleteBtn);
-            }
-            gallery.appendChild(div);
-        });
+        allPhotos = snap.docs.map(photoDoc => ({
+            id: photoDoc.id,
+            ...photoDoc.data()
+        }));
+        renderGallery();
     }, showError);
 }
 
-function openViewer(img) {
+function openViewer(index) {
+    if (!visiblePhotos[index]) return;
+
+    currentPhotoIndex = index;
+    const photo = visiblePhotos[currentPhotoIndex];
     viewer.classList.add("active");
-    viewerImg.src = img;
+    viewer.setAttribute("aria-hidden", "false");
+    viewerImg.src = photo.image;
+    viewerCaption.textContent = `${photo.caption || "Ujęcie z drona"} • ${photo.user || "Autor nieznany"} • ${formatDate(photo.time)}`;
 }
 
-document.getElementById("close").addEventListener("click", () => {
+function closeViewer() {
     viewer.classList.remove("active");
-});
+    viewer.setAttribute("aria-hidden", "true");
+    viewerImg.removeAttribute("src");
+}
 
-viewer.addEventListener("click", e => {
-    if (e.target === viewer) {
-        viewer.classList.remove("active");
+function showNextPhoto(direction) {
+    if (!visiblePhotos.length) return;
+    currentPhotoIndex = (currentPhotoIndex + direction + visiblePhotos.length) % visiblePhotos.length;
+    openViewer(currentPhotoIndex);
+}
+
+function downloadPhoto(photo = visiblePhotos[currentPhotoIndex]) {
+    if (!photo?.image) return;
+
+    const link = document.createElement("a");
+    link.href = photo.image;
+    link.download = `zdjecie-dron-${photo.id || Date.now()}.jpg`;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+}
+
+function resetSignedOutState() {
+    loginBtn.disabled = false;
+    loginBtn.style.display = "inline-flex";
+    logoutBtn.disabled = false;
+    logoutBtn.style.display = "none";
+    uploadBox.style.display = "none";
+    accountMode.textContent = "Gość";
+    allPhotos = [];
+    visiblePhotos = [];
+    gallery.innerHTML = "";
+    photoCount.textContent = "0";
+    galleryStatus.textContent = "Zaloguj się";
+    resetSelectedFile();
+
+    if (unsubscribeGallery) {
+        unsubscribeGallery();
+        unsubscribeGallery = null;
     }
-});
-</script>
+}
 
+loginBtn.addEventListener("click", loginWithGoogle);
+logoutBtn.addEventListener("click", logout);
+uploadBtn.addEventListener("click", uploadPhoto);
+
+fileInput.addEventListener("change", () => setSelectedFile(fileInput.files[0]));
+
+["dragenter", "dragover"].forEach(eventName => {
+    dropzone.addEventListener(eventName, event => {
+        event.preventDefault();
+        dropzone.classList.add("dragover");
+    });
+});
+
+["dragleave", "drop"].forEach(eventName => {
+    dropzone.addEventListener(eventName, event => {
+        event.preventDefault();
+        dropzone.classList.remove("dragover");
+    });
+});
+
+dropzone.addEventListener("drop", event => {
+    const file = event.dataTransfer.files[0];
+    setSelectedFile(file);
+});
+
+searchInput.addEventListener("input", renderGallery);
+sortSelect.addEventListener("change", renderGallery);
+clearFiltersBtn.addEventListener("click", () => {
+    searchInput.value = "";
+    sortSelect.value = "newest";
+    renderGallery();
+});
+
+document.getElementById("close").addEventListener("click", closeViewer);
+prevBtn.addEventListener("click", () => showNextPhoto(-1));
+nextBtn.addEventListener("click", () => showNextPhoto(1));
+downloadBtn.addEventListener("click", () => downloadPhoto());
+
+viewer.addEventListener("click", event => {
+    if (event.target === viewer) closeViewer();
+});
+
+document.addEventListener("keydown", event => {
+    if (!viewer.classList.contains("active")) return;
+    if (event.key === "Escape") closeViewer();
+    if (event.key === "ArrowLeft") showNextPhoto(-1);
+    if (event.key === "ArrowRight") showNextPhoto(1);
+});
+
+getRedirectResult(auth).catch(showError);
+
+onAuthStateChanged(auth, user => {
+    if (user) {
+        const admin = isAdmin(user);
+        const label = user.displayName || getUserEmail(user) || "konto Google";
+
+        loginBtn.style.display = "none";
+        logoutBtn.style.display = "inline-flex";
+        uploadBox.style.display = admin ? "block" : "none";
+        accountMode.textContent = admin ? "Admin" : "Podgląd";
+        showMessage(`Zalogowano jako ${label}.`, "success");
+        loadGallery();
+        renderGallery();
+        return;
+    }
+
+    resetSignedOutState();
+    showMessage("Zaloguj się, aby zobaczyć galerię.", "info");
+});
+
+saveFavorites();
+</script>
 </body>
 </html>
