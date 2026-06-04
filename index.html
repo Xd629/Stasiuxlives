@@ -376,13 +376,13 @@ function showPasswordControls(show) {
     passwordBtn.style.display = show ? "inline-block" : "none";
 }
 
-function enableEditMode() {
-    canEdit = true;
+function enablePasswordPreview() {
+    canEdit = false;
     loginBtn.style.display = "none";
     showPasswordControls(false);
     logoutBtn.style.display = "inline-block";
-    uploadBox.style.display = "block";
-    showMessage("Tryb edycji", "success");
+    uploadBox.style.display = "none";
+    showMessage("Podgląd", "info");
     loadGallery();
     renderGalleryControls();
 }
@@ -395,7 +395,7 @@ passwordBtn.addEventListener("click", () => {
 
     passwordEdit = true;
     passwordInput.value = "";
-    enableEditMode();
+    enablePasswordPreview();
 });
 
 passwordInput.addEventListener("keydown", event => {
@@ -469,7 +469,7 @@ onAuthStateChanged(auth, async user => {
     }
 
     if (passwordEdit) {
-        enableEditMode();
+        enablePasswordPreview();
         return;
     }
 
