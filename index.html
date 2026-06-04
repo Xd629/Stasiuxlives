@@ -166,7 +166,8 @@ input[type="file"]{
     box-shadow:0 18px 45px rgba(0,0,0,.24);
 }
 
-.photo img{
+.photo img,
+.photo video{
     width:100%;
     height:250px;
     display:block;
@@ -175,7 +176,8 @@ input[type="file"]{
     transition:transform .25s ease,filter .25s ease;
 }
 
-.photo img:hover{
+.photo img:hover,
+.photo video:hover{
     transform:scale(1.035);
     filter:saturate(1.12);
 }
@@ -206,7 +208,8 @@ input[type="file"]{
     display:flex;
 }
 
-.viewer img{
+.viewer img,
+.viewer video{
     max-width:95%;
     max-height:95%;
     border-radius:18px;
@@ -237,9 +240,9 @@ input[type="file"]{
         <div id="userBox"></div>
 
         <div id="uploadBox" style="display:none;">
-            <input type="file" id="fileInput" accept="image/*">
+            <input type="file" id="fileInput" accept="image/*,video/*" multiple>
             <br>
-            <button id="uploadBtn" class="upload-btn">Dodaj zdjęcie</button>
+            <button id="uploadBtn" class="upload-btn">Dodaj zdjęcia / filmy</button>
         </div>
     </div>
 
@@ -252,6 +255,7 @@ input[type="file"]{
 <div class="viewer" id="viewer">
     <div class="close" id="close">✕</div>
     <img id="viewerImg">
+    <video id="viewerVideo" controls></video>
 </div>
 
 <script type="module">
@@ -304,6 +308,7 @@ const userBox = document.getElementById("userBox");
 const gallery = document.getElementById("gallery");
 const viewer = document.getElementById("viewer");
 const viewerImg = document.getElementById("viewerImg");
+const viewerVideo = document.getElementById("viewerVideo");
 
 let unsubscribeGallery = null;
 let canEdit = false;
@@ -446,8 +451,25 @@ function imageToBase64(file) {
     });
 }
 
+function fileToBase64(file) {
+    if (file.type.startsWith("image/")) {
+        return imageToBase64(file);
+    }
+
+    if (!file.type.startsWith("video/")) {
+        return Promise.reject(new Error("Wybierz zdjęcie albo film."));
+    }
+
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = () => reject(new Error("Nie udało się odczytać pliku."));
+        reader.readAsDataURL(file);
+    });
+}
+
 uploadBtn.addEventListener("click", async () => {
-    const file = fileInput.files[0];
+    const files = Array.from(fileInput.files);
 
     if (!auth.currentUser) {
         showMessage("Najpierw zaloguj się przez Google.", "error");
@@ -459,30 +481,36 @@ uploadBtn.addEventListener("click", async () => {
         return;
     }
 
-    if (!file) {
-        showMessage("Wybierz zdjęcie do dodania.", "error");
+    if (!files.length) {
+        showMessage("Wybierz zdjęcie albo film do dodania.", "error");
         return;
     }
 
     uploadBtn.disabled = true;
-    showMessage("Dodawanie zdjęcia...", "info");
+    showMessage(`Dodawanie plików: 0/${files.length}`, "info");
 
     try {
-        const image = await imageToBase64(file);
+        for (const [index, file] of files.entries()) {
+            const media = await fileToBase64(file);
 
-        if (image.length > 900_000) {
-            throw new Error("Zdjęcie jest za duże po kompresji. Wybierz mniejszy plik.");
+            if (media.length > 900_000) {
+                throw new Error(`${file.name} jest za duży. Wybierz mniejszy plik.`);
+            }
+
+            await addDoc(collection(db, "photos"), {
+                image: media,
+                media,
+                type: file.type.startsWith("video/") ? "video" : "image",
+                user: auth.currentUser.displayName || auth.currentUser.email,
+                uid: auth.currentUser.uid,
+                time: Date.now() + index
+            });
+
+            showMessage(`Dodawanie plików: ${index + 1}/${files.length}`, "info");
         }
 
-        await addDoc(collection(db, "photos"), {
-            image,
-            user: auth.currentUser.displayName || auth.currentUser.email,
-            uid: auth.currentUser.uid,
-            time: Date.now()
-        });
-
         fileInput.value = "";
-        showMessage("Zdjęcie dodane.", "success");
+        showMessage(files.length === 1 ? "Plik dodany." : "Pliki dodane.", "success");
     } catch (error) {
         showError(error);
     } finally {
@@ -515,16 +543,25 @@ function createPhotoCard(photoDoc) {
     div.className = "photo";
     div.dataset.photoId = photoDoc.id;
 
-    const img = document.createElement("img");
-    img.src = data.image;
-    img.alt = `Zdjęcie dodane przez ${data.user || "użytkownika"}`;
-    img.addEventListener("click", () => openViewer(data.image));
+    const mediaSrc = data.media || data.image;
+    const isVideo = data.type === "video";
+    const media = document.createElement(isVideo ? "video" : "img");
+    media.src = mediaSrc;
+
+    if (isVideo) {
+        media.controls = true;
+        media.preload = "metadata";
+    } else {
+        media.alt = `Zdjęcie dodane przez ${data.user || "użytkownika"}`;
+    }
+
+    media.addEventListener("click", () => openViewer(mediaSrc, data.type));
 
     const meta = document.createElement("p");
     meta.className = "photo-meta";
     meta.textContent = data.user ? `Autor: ${data.user}` : "Autor nieznany";
 
-    div.append(img, meta);
+    div.append(media, meta);
 
     if (canEdit) {
         div.appendChild(createDeleteButton(photoDoc.id));
@@ -571,18 +608,34 @@ function renderGalleryControls() {
     });
 }
 
-function openViewer(img) {
+function openViewer(src, type = "image") {
     viewer.classList.add("active");
-    viewerImg.src = img;
+
+    if (type === "video") {
+        viewerImg.style.display = "none";
+        viewerVideo.style.display = "block";
+        viewerVideo.src = src;
+        return;
+    }
+
+    viewerVideo.pause();
+    viewerVideo.removeAttribute("src");
+    viewerVideo.style.display = "none";
+    viewerImg.style.display = "block";
+    viewerImg.src = src;
 }
 
-document.getElementById("close").addEventListener("click", () => {
+function closeViewer() {
     viewer.classList.remove("active");
-});
+    viewerVideo.pause();
+    viewerVideo.removeAttribute("src");
+}
+
+document.getElementById("close").addEventListener("click", closeViewer);
 
 viewer.addEventListener("click", e => {
     if (e.target === viewer) {
-        viewer.classList.remove("active");
+        closeViewer();
     }
 });
 </script>
