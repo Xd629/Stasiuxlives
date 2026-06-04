@@ -6,27 +6,47 @@
 <title>Zdjęcia - dron</title>
 
 <style>
+:root{
+    --bg:#050816;
+    --card:rgba(10,18,35,.72);
+    --card-border:rgba(255,255,255,.14);
+    --text:#f8fafc;
+    --muted:#cbd5e1;
+    --blue:#60a5fa;
+    --green:#22c55e;
+    --red:#ef4444;
+    --violet:#a78bfa;
+}
+
 *{
     margin:0;
     padding:0;
     box-sizing:border-box;
-    font-family:Arial,sans-serif;
+    font-family:Inter,Arial,sans-serif;
 }
 
 body{
     min-height:100vh;
     background:
-    linear-gradient(rgba(0,0,0,.75),rgba(0,0,0,.75)),
-    url("https://images.unsplash.com/photo-1501785888041-af3ef285b470?q=80&w=2000&auto=format&fit=crop");
+        radial-gradient(circle at top left,rgba(96,165,250,.32),transparent 34%),
+        radial-gradient(circle at top right,rgba(167,139,250,.28),transparent 30%),
+        linear-gradient(rgba(5,8,22,.78),rgba(5,8,22,.86)),
+        url("https://images.unsplash.com/photo-1501785888041-af3ef285b470?q=80&w=2000&auto=format&fit=crop");
+    background-attachment:fixed;
+    background-position:center;
     background-size:cover;
-    color:white;
+    color:var(--text);
 }
 
 header{
-    text-align:center;
-    padding:30px;
-    font-size:28px;
-    font-weight:bold;
+    max-width:1100px;
+    margin:0 auto;
+    padding:46px 20px 18px;
+    text-align:left;
+    font-size:clamp(34px,6vw,64px);
+    font-weight:900;
+    letter-spacing:-.05em;
+    text-shadow:0 18px 45px rgba(0,0,0,.55);
 }
 
 .container{
@@ -36,43 +56,61 @@ header{
 }
 
 .card{
-    background:rgba(20,20,20,.75);
-    border-radius:18px;
-    padding:20px;
-    margin-bottom:20px;
-    backdrop-filter:blur(10px);
+    background:var(--card);
+    border:1px solid var(--card-border);
+    border-radius:28px;
+    padding:24px;
+    margin-bottom:22px;
+    box-shadow:0 24px 90px rgba(0,0,0,.42);
+    backdrop-filter:blur(18px);
+}
+
+.auth-actions{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+    align-items:center;
 }
 
 button{
-    padding:12px 16px;
+    padding:13px 18px;
     border:none;
-    border-radius:10px;
+    border-radius:999px;
     cursor:pointer;
-    font-weight:bold;
+    font-weight:800;
+    letter-spacing:.01em;
+    transition:transform .18s ease,box-shadow .18s ease,opacity .18s ease;
+}
+
+button:hover:not(:disabled){
+    transform:translateY(-2px);
 }
 
 .login-btn{
-    background:#4285F4;
+    background:linear-gradient(135deg,#4285f4,var(--blue));
     color:white;
+    box-shadow:0 12px 30px rgba(66,133,244,.34);
 }
 
 .logout-btn{
-    background:#64748b;
+    background:rgba(100,116,139,.34);
     color:white;
-    margin-left:8px;
+    border:1px solid rgba(255,255,255,.16);
 }
 
 .upload-btn{
-    background:#22c55e;
+    background:linear-gradient(135deg,var(--green),#16a34a);
     color:white;
-    margin-top:10px;
+    margin-top:12px;
+    box-shadow:0 12px 30px rgba(34,197,94,.28);
 }
 
 .delete-btn{
-    background:#ef4444;
+    background:linear-gradient(135deg,var(--red),#b91c1c);
     color:white;
-    width:100%;
-    margin-top:8px;
+    width:calc(100% - 20px);
+    margin:0 10px 12px;
+    box-shadow:0 10px 24px rgba(239,68,68,.2);
 }
 
 button:disabled{
@@ -80,43 +118,78 @@ button:disabled{
     cursor:not-allowed;
 }
 
+input[type="file"]{
+    width:100%;
+    max-width:420px;
+    margin-top:18px;
+    padding:12px;
+    color:var(--muted);
+    background:rgba(15,23,42,.66);
+    border:1px dashed rgba(255,255,255,.24);
+    border-radius:18px;
+}
+
 .message{
-    margin-top:12px;
-    line-height:1.4;
+    display:inline-flex;
+    align-items:center;
+    min-height:34px;
+    margin-top:14px;
+    padding:8px 13px;
+    border-radius:999px;
+    background:rgba(148,163,184,.14);
+    color:var(--muted);
+    line-height:1.35;
+    font-weight:700;
 }
 
 .message.success{
+    background:rgba(34,197,94,.15);
     color:#86efac;
 }
 
 .message.error{
+    background:rgba(239,68,68,.14);
     color:#fca5a5;
-}
-
-.photo-meta,
-.empty{
-    padding:10px;
-    color:#d1d5db;
-    font-size:14px;
 }
 
 .gallery{
     display:grid;
     grid-template-columns:repeat(auto-fill,minmax(250px,1fr));
-    gap:15px;
+    gap:18px;
 }
 
 .photo{
-    background:#111;
-    border-radius:15px;
+    background:rgba(2,6,23,.72);
+    border:1px solid rgba(255,255,255,.11);
+    border-radius:22px;
     overflow:hidden;
+    box-shadow:0 18px 45px rgba(0,0,0,.24);
 }
 
 .photo img{
     width:100%;
-    height:240px;
+    height:250px;
+    display:block;
     object-fit:cover;
     cursor:pointer;
+    transition:transform .25s ease,filter .25s ease;
+}
+
+.photo img:hover{
+    transform:scale(1.035);
+    filter:saturate(1.12);
+}
+
+.photo-meta,
+.empty{
+    padding:12px 14px;
+    color:var(--muted);
+    font-size:14px;
+}
+
+.empty{
+    grid-column:1/-1;
+    text-align:center;
 }
 
 .viewer{
@@ -136,6 +209,8 @@ button:disabled{
 .viewer img{
     max-width:95%;
     max-height:95%;
+    border-radius:18px;
+    box-shadow:0 30px 100px rgba(0,0,0,.7);
 }
 
 .close{
@@ -155,8 +230,10 @@ button:disabled{
 <div class="container">
 
     <div class="card">
-        <button id="loginBtn" class="login-btn">Zaloguj przez Google</button>
-        <button id="logoutBtn" class="logout-btn" style="display:none;">Wyloguj</button>
+        <div class="auth-actions">
+            <button id="loginBtn" class="login-btn">Zaloguj przez Google</button>
+            <button id="logoutBtn" class="logout-btn" style="display:none;">Wyloguj</button>
+        </div>
         <div id="userBox"></div>
 
         <div id="uploadBox" style="display:none;">
@@ -186,6 +263,7 @@ import {
   signInWithRedirect,
   signOut,
   getRedirectResult,
+  getIdTokenResult,
   onAuthStateChanged
 } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-auth.js";
 import {
@@ -214,6 +292,7 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 const provider = new GoogleAuthProvider();
 provider.addScope("email");
+provider.setCustomParameters({ prompt: "select_account" });
 const ADMIN_EMAIL = "playstationsony106@gmail.com";
 
 const loginBtn = document.getElementById("loginBtn");
@@ -227,6 +306,7 @@ const viewer = document.getElementById("viewer");
 const viewerImg = document.getElementById("viewerImg");
 
 let unsubscribeGallery = null;
+let canEdit = false;
 
 function showMessage(text, type = "info") {
     userBox.textContent = text;
@@ -243,17 +323,32 @@ function normalizeEmail(email) {
     return (email || "").trim().toLowerCase();
 }
 
-function getUserEmails(user) {
+function getUserEmails(user, tokenResult = null) {
     return [
         user?.email,
+        tokenResult?.claims?.email,
         ...(user?.providerData || []).map(profile => profile.email)
     ]
         .map(normalizeEmail)
         .filter(Boolean);
 }
 
-function isAdmin(user) {
-    return getUserEmails(user).includes(ADMIN_EMAIL);
+function isAdmin(user, tokenResult = null) {
+    return getUserEmails(user, tokenResult).includes(ADMIN_EMAIL);
+}
+
+async function getAdminState(user) {
+    if (!user) return false;
+
+    try {
+        await user.reload();
+        const currentUser = auth.currentUser || user;
+        const tokenResult = await getIdTokenResult(currentUser, true);
+        return isAdmin(currentUser, tokenResult);
+    } catch (error) {
+        console.warn("Nie udało się odświeżyć danych użytkownika.", error);
+        return isAdmin(auth.currentUser || user);
+    }
 }
 
 logoutBtn.addEventListener("click", async () => {
@@ -290,18 +385,24 @@ loginBtn.addEventListener("click", async () => {
 
 getRedirectResult(auth).catch(showError);
 
-onAuthStateChanged(auth, user => {
+onAuthStateChanged(auth, async user => {
     if (user) {
-        const admin = isAdmin(user);
+        showMessage("Sprawdzanie...", "info");
+        const admin = await getAdminState(user);
 
+        if (auth.currentUser?.uid !== user.uid) return;
+
+        canEdit = admin;
         loginBtn.style.display = "none";
         logoutBtn.style.display = "inline-block";
-        uploadBox.style.display = admin ? "block" : "none";
-        showMessage(admin ? "Tryb edycji" : "Podgląd", admin ? "success" : "info");
+        uploadBox.style.display = canEdit ? "block" : "none";
+        showMessage(canEdit ? "Tryb edycji" : "Podgląd", canEdit ? "success" : "info");
         loadGallery();
+        renderGalleryControls();
         return;
     }
 
+    canEdit = false;
     loginBtn.disabled = false;
     loginBtn.style.display = "inline-block";
     logoutBtn.disabled = false;
@@ -353,7 +454,7 @@ uploadBtn.addEventListener("click", async () => {
         return;
     }
 
-    if (!isAdmin(auth.currentUser)) {
+    if (!canEdit) {
         showMessage("Brak uprawnień do dodawania.", "error");
         return;
     }
@@ -403,46 +504,71 @@ function loadGallery() {
         }
 
         snap.forEach(photoDoc => {
-            const data = photoDoc.data();
-            const div = document.createElement("div");
-            div.className = "photo";
-
-            const img = document.createElement("img");
-            img.src = data.image;
-            img.alt = `Zdjęcie dodane przez ${data.user || "użytkownika"}`;
-            img.addEventListener("click", () => openViewer(data.image));
-
-            const meta = document.createElement("p");
-            meta.className = "photo-meta";
-            meta.textContent = data.user ? `Autor: ${data.user}` : "Autor nieznany";
-
-            div.append(img, meta);
-
-            if (isAdmin(auth.currentUser)) {
-                const deleteBtn = document.createElement("button");
-                deleteBtn.className = "delete-btn";
-                deleteBtn.type = "button";
-                deleteBtn.textContent = "Usuń";
-                deleteBtn.addEventListener("click", async () => {
-                    if (!isAdmin(auth.currentUser)) {
-                        showMessage("Brak uprawnień do usuwania.", "error");
-                        return;
-                    }
-
-                    deleteBtn.disabled = true;
-                    try {
-                        await deleteDoc(doc(db, "photos", photoDoc.id));
-                    } catch (error) {
-                        showError(error);
-                        deleteBtn.disabled = false;
-                    }
-                });
-
-                div.appendChild(deleteBtn);
-            }
-            gallery.appendChild(div);
+            gallery.appendChild(createPhotoCard(photoDoc));
         });
     }, showError);
+}
+
+function createPhotoCard(photoDoc) {
+    const data = photoDoc.data();
+    const div = document.createElement("div");
+    div.className = "photo";
+    div.dataset.photoId = photoDoc.id;
+
+    const img = document.createElement("img");
+    img.src = data.image;
+    img.alt = `Zdjęcie dodane przez ${data.user || "użytkownika"}`;
+    img.addEventListener("click", () => openViewer(data.image));
+
+    const meta = document.createElement("p");
+    meta.className = "photo-meta";
+    meta.textContent = data.user ? `Autor: ${data.user}` : "Autor nieznany";
+
+    div.append(img, meta);
+
+    if (canEdit) {
+        div.appendChild(createDeleteButton(photoDoc.id));
+    }
+
+    return div;
+}
+
+function createDeleteButton(photoId) {
+    const deleteBtn = document.createElement("button");
+    deleteBtn.className = "delete-btn";
+    deleteBtn.type = "button";
+    deleteBtn.textContent = "Usuń";
+    deleteBtn.addEventListener("click", async () => {
+        if (!canEdit) {
+            showMessage("Brak uprawnień do usuwania.", "error");
+            return;
+        }
+
+        deleteBtn.disabled = true;
+        try {
+            await deleteDoc(doc(db, "photos", photoId));
+        } catch (error) {
+            showError(error);
+            deleteBtn.disabled = false;
+        }
+    });
+
+    return deleteBtn;
+}
+
+function renderGalleryControls() {
+    gallery.querySelectorAll(".photo").forEach(photo => {
+        const existingDeleteBtn = photo.querySelector(".delete-btn");
+
+        if (!canEdit) {
+            existingDeleteBtn?.remove();
+            return;
+        }
+
+        if (!existingDeleteBtn) {
+            photo.appendChild(createDeleteButton(photo.dataset.photoId));
+        }
+    });
 }
 
 function openViewer(img) {
