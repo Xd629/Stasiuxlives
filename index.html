@@ -2,7 +2,7 @@
 <html lang="pl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="theme-color" content="#050816">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon.svg" type="image/svg+xml">
@@ -29,8 +29,13 @@
     font-family:Inter,Arial,sans-serif;
 }
 
+html{
+    background:var(--bg);
+}
+
 body{
     min-height:100vh;
+    min-height:100dvh;
     background:
         radial-gradient(circle at top left,rgba(96,165,250,.32),transparent 34%),
         radial-gradient(circle at top right,rgba(167,139,250,.28),transparent 30%),
