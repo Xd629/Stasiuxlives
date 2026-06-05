@@ -806,7 +806,7 @@ async function resetAccess(message = "Wylogowano.", type = "success") {
     selectedPhotos.clear();
 
     try {
-        if (auth.currentUser) {
+        if (auth.currentUser && !auth.currentUser.isAnonymous) {
             await signOut(auth);
         }
     } catch (error) {
@@ -874,6 +874,13 @@ onAuthStateChanged(auth, async user => {
     if (user) {
         if (user.isAnonymous) {
             if (passwordMode) return;
+
+            if (googleLoginRequested && !googleLoginStarted) {
+                showMessage("Przełączanie z hasła na logowanie Google...", "info");
+                await signOut(auth);
+                return;
+            }
+
             showMessage("Wpisz hasło, aby dostać dostęp do galerii.", "info");
             return;
         }
