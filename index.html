@@ -6,27 +6,47 @@
 <title>Zdjęcia - dron</title>
 
 <style>
+:root{
+    --bg:#050816;
+    --card:rgba(10,18,35,.72);
+    --card-border:rgba(255,255,255,.14);
+    --text:#f8fafc;
+    --muted:#cbd5e1;
+    --blue:#60a5fa;
+    --green:#22c55e;
+    --red:#ef4444;
+    --violet:#a78bfa;
+}
+
 *{
     margin:0;
     padding:0;
     box-sizing:border-box;
-    font-family:Arial,sans-serif;
+    font-family:Inter,Arial,sans-serif;
 }
 
 body{
     min-height:100vh;
     background:
-    linear-gradient(rgba(0,0,0,.75),rgba(0,0,0,.75)),
-    url("https://images.unsplash.com/photo-1501785888041-af3ef285b470?q=80&w=2000&auto=format&fit=crop");
+        radial-gradient(circle at top left,rgba(96,165,250,.32),transparent 34%),
+        radial-gradient(circle at top right,rgba(167,139,250,.28),transparent 30%),
+        linear-gradient(rgba(5,8,22,.78),rgba(5,8,22,.86)),
+        url("https://images.unsplash.com/photo-1501785888041-af3ef285b470?q=80&w=2000&auto=format&fit=crop");
+    background-attachment:fixed;
+    background-position:center;
     background-size:cover;
-    color:white;
+    color:var(--text);
 }
 
 header{
-    text-align:center;
-    padding:30px;
-    font-size:28px;
-    font-weight:bold;
+    max-width:1100px;
+    margin:0 auto;
+    padding:46px 20px 18px;
+    text-align:left;
+    font-size:clamp(34px,6vw,64px);
+    font-weight:900;
+    letter-spacing:-.05em;
+    text-shadow:0 18px 45px rgba(0,0,0,.55);
 }
 
 .container{
@@ -36,37 +56,61 @@ header{
 }
 
 .card{
-    background:rgba(20,20,20,.75);
-    border-radius:18px;
-    padding:20px;
-    margin-bottom:20px;
-    backdrop-filter:blur(10px);
+    background:var(--card);
+    border:1px solid var(--card-border);
+    border-radius:28px;
+    padding:24px;
+    margin-bottom:22px;
+    box-shadow:0 24px 90px rgba(0,0,0,.42);
+    backdrop-filter:blur(18px);
+}
+
+.auth-actions{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+    align-items:center;
 }
 
 button{
-    padding:12px 16px;
+    padding:13px 18px;
     border:none;
-    border-radius:10px;
+    border-radius:999px;
     cursor:pointer;
-    font-weight:bold;
+    font-weight:800;
+    letter-spacing:.01em;
+    transition:transform .18s ease,box-shadow .18s ease,opacity .18s ease;
+}
+
+button:hover:not(:disabled){
+    transform:translateY(-2px);
 }
 
 .login-btn{
-    background:#4285F4;
+    background:linear-gradient(135deg,#4285f4,var(--blue));
     color:white;
+    box-shadow:0 12px 30px rgba(66,133,244,.34);
+}
+
+.logout-btn{
+    background:rgba(100,116,139,.34);
+    color:white;
+    border:1px solid rgba(255,255,255,.16);
 }
 
 .upload-btn{
-    background:#22c55e;
+    background:linear-gradient(135deg,var(--green),#16a34a);
     color:white;
-    margin-top:10px;
+    margin-top:12px;
+    box-shadow:0 12px 30px rgba(34,197,94,.28);
 }
 
 .delete-btn{
-    background:#ef4444;
+    background:linear-gradient(135deg,var(--red),#b91c1c);
     color:white;
-    width:100%;
-    margin-top:8px;
+    width:calc(100% - 20px);
+    margin:0 10px 12px;
+    box-shadow:0 10px 24px rgba(239,68,68,.2);
 }
 
 button:disabled{
@@ -74,43 +118,89 @@ button:disabled{
     cursor:not-allowed;
 }
 
+input[type="file"]{
+    width:100%;
+    max-width:420px;
+    margin-top:18px;
+    padding:12px;
+    color:var(--muted);
+    background:rgba(15,23,42,.66);
+    border:1px dashed rgba(255,255,255,.24);
+    border-radius:18px;
+}
+
+.password-input{
+    padding:13px 18px;
+    color:var(--text);
+    background:rgba(15,23,42,.66);
+    border:1px solid rgba(255,255,255,.16);
+    border-radius:999px;
+    outline:none;
+}
+
 .message{
-    margin-top:12px;
-    line-height:1.4;
+    display:inline-flex;
+    align-items:center;
+    min-height:34px;
+    margin-top:14px;
+    padding:8px 13px;
+    border-radius:999px;
+    background:rgba(148,163,184,.14);
+    color:var(--muted);
+    line-height:1.35;
+    font-weight:700;
 }
 
 .message.success{
+    background:rgba(34,197,94,.15);
     color:#86efac;
 }
 
 .message.error{
+    background:rgba(239,68,68,.14);
     color:#fca5a5;
-}
-
-.photo-meta,
-.empty{
-    padding:10px;
-    color:#d1d5db;
-    font-size:14px;
 }
 
 .gallery{
     display:grid;
     grid-template-columns:repeat(auto-fill,minmax(250px,1fr));
-    gap:15px;
+    gap:18px;
 }
 
 .photo{
-    background:#111;
-    border-radius:15px;
+    background:rgba(2,6,23,.72);
+    border:1px solid rgba(255,255,255,.11);
+    border-radius:22px;
     overflow:hidden;
+    box-shadow:0 18px 45px rgba(0,0,0,.24);
 }
 
-.photo img{
+.photo img,
+.photo video{
     width:100%;
-    height:240px;
+    height:250px;
+    display:block;
     object-fit:cover;
     cursor:pointer;
+    transition:transform .25s ease,filter .25s ease;
+}
+
+.photo img:hover,
+.photo video:hover{
+    transform:scale(1.035);
+    filter:saturate(1.12);
+}
+
+.photo-meta,
+.empty{
+    padding:12px 14px;
+    color:var(--muted);
+    font-size:14px;
+}
+
+.empty{
+    grid-column:1/-1;
+    text-align:center;
 }
 
 .viewer{
@@ -127,9 +217,12 @@ button:disabled{
     display:flex;
 }
 
-.viewer img{
+.viewer img,
+.viewer video{
     max-width:95%;
     max-height:95%;
+    border-radius:18px;
+    box-shadow:0 30px 100px rgba(0,0,0,.7);
 }
 
 .close{
@@ -149,13 +242,18 @@ button:disabled{
 <div class="container">
 
     <div class="card">
-        <button id="loginBtn" class="login-btn">Zaloguj przez Google</button>
+        <div class="auth-actions">
+            <button id="loginBtn" class="login-btn">Zaloguj przez Google</button>
+            <input type="password" id="passwordInput" class="password-input" placeholder="Hasło">
+            <button id="passwordBtn" class="logout-btn">OK</button>
+            <button id="logoutBtn" class="logout-btn" style="display:none;">Wyloguj</button>
+        </div>
         <div id="userBox"></div>
 
         <div id="uploadBox" style="display:none;">
-            <input type="file" id="fileInput" accept="image/*">
+            <input type="file" id="fileInput" accept="image/*,video/*" multiple>
             <br>
-            <button id="uploadBtn" class="upload-btn">Dodaj zdjęcie</button>
+            <button id="uploadBtn" class="upload-btn">Dodaj zdjęcia / filmy</button>
         </div>
     </div>
 
@@ -168,6 +266,7 @@ button:disabled{
 <div class="viewer" id="viewer">
     <div class="close" id="close">✕</div>
     <img id="viewerImg">
+    <video id="viewerVideo" controls></video>
 </div>
 
 <script type="module">
@@ -177,7 +276,9 @@ import {
   GoogleAuthProvider,
   signInWithPopup,
   signInWithRedirect,
+  signOut,
   getRedirectResult,
+  getIdTokenResult,
   onAuthStateChanged
 } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-auth.js";
 import {
@@ -205,8 +306,15 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 const provider = new GoogleAuthProvider();
+provider.addScope("email");
+provider.setCustomParameters({ prompt: "select_account" });
+const ADMIN_EMAIL = "playstationsony106@gmail.com";
+const EDIT_PASSWORD = "dji-mini-5-pro";
 
 const loginBtn = document.getElementById("loginBtn");
+const passwordInput = document.getElementById("passwordInput");
+const passwordBtn = document.getElementById("passwordBtn");
+const logoutBtn = document.getElementById("logoutBtn");
 const uploadBtn = document.getElementById("uploadBtn");
 const fileInput = document.getElementById("fileInput");
 const uploadBox = document.getElementById("uploadBox");
@@ -214,8 +322,11 @@ const userBox = document.getElementById("userBox");
 const gallery = document.getElementById("gallery");
 const viewer = document.getElementById("viewer");
 const viewerImg = document.getElementById("viewerImg");
+const viewerVideo = document.getElementById("viewerVideo");
 
 let unsubscribeGallery = null;
+let canEdit = false;
+let passwordEdit = false;
 
 function showMessage(text, type = "info") {
     userBox.textContent = text;
@@ -227,6 +338,97 @@ function showError(error) {
     const details = error?.message ? ` (${error.message})` : "";
     showMessage(`Błąd: ${details}`, "error");
 }
+
+function normalizeEmail(email) {
+    return (email || "").trim().toLowerCase();
+}
+
+function getUserEmails(user, tokenResult = null) {
+    return [
+        user?.email,
+        tokenResult?.claims?.email,
+        ...(user?.providerData || []).map(profile => profile.email)
+    ]
+        .map(normalizeEmail)
+        .filter(Boolean);
+}
+
+function isAdmin(user, tokenResult = null) {
+    return getUserEmails(user, tokenResult).includes(ADMIN_EMAIL);
+}
+
+async function getAdminState(user) {
+    if (!user) return false;
+
+    try {
+        await user.reload();
+        const currentUser = auth.currentUser || user;
+        const tokenResult = await getIdTokenResult(currentUser, true);
+        return isAdmin(currentUser, tokenResult);
+    } catch (error) {
+        console.warn("Nie udało się odświeżyć danych użytkownika.", error);
+        return isAdmin(auth.currentUser || user);
+    }
+}
+
+function showPasswordControls(show) {
+    passwordInput.style.display = show ? "inline-block" : "none";
+    passwordBtn.style.display = show ? "inline-block" : "none";
+}
+
+function enablePasswordPreview() {
+    canEdit = false;
+    loginBtn.style.display = "none";
+    showPasswordControls(false);
+    logoutBtn.style.display = "inline-block";
+    uploadBox.style.display = "none";
+    showMessage("Podgląd", "info");
+    loadGallery();
+    renderGalleryControls();
+}
+
+passwordBtn.addEventListener("click", () => {
+    if (passwordInput.value.trim() !== EDIT_PASSWORD) {
+        showMessage("Złe hasło.", "error");
+        return;
+    }
+
+    passwordEdit = true;
+    passwordInput.value = "";
+    enablePasswordPreview();
+});
+
+passwordInput.addEventListener("keydown", event => {
+    if (event.key === "Enter") {
+        passwordBtn.click();
+    }
+});
+
+logoutBtn.addEventListener("click", async () => {
+    logoutBtn.disabled = true;
+    showMessage("Wylogowywanie...", "info");
+
+    try {
+        passwordEdit = false;
+        canEdit = false;
+        await signOut(auth);
+        loginBtn.style.display = "inline-block";
+        showPasswordControls(true);
+        logoutBtn.style.display = "none";
+        uploadBox.style.display = "none";
+        gallery.innerHTML = "";
+        if (unsubscribeGallery) {
+            unsubscribeGallery();
+            unsubscribeGallery = null;
+        }
+        renderGalleryControls();
+        showMessage("Wylogowano.", "success");
+    } catch (error) {
+        showError(error);
+    } finally {
+        logoutBtn.disabled = false;
+    }
+});
 
 loginBtn.addEventListener("click", async () => {
     loginBtn.disabled = true;
@@ -248,20 +450,38 @@ loginBtn.addEventListener("click", async () => {
 
 getRedirectResult(auth).catch(showError);
 
-onAuthStateChanged(auth, user => {
+onAuthStateChanged(auth, async user => {
     if (user) {
+        showMessage("Sprawdzanie...", "info");
+        const admin = await getAdminState(user);
+
+        if (auth.currentUser?.uid !== user.uid) return;
+
+        canEdit = admin;
         loginBtn.style.display = "none";
-        uploadBox.style.display = "block";
-        showMessage(`Zalogowano jako: ${user.displayName || user.email}`, "success");
+        showPasswordControls(false);
+        logoutBtn.style.display = "inline-block";
+        uploadBox.style.display = canEdit ? "block" : "none";
+        showMessage(canEdit ? "Tryb edycji" : "Podgląd", canEdit ? "success" : "info");
         loadGallery();
+        renderGalleryControls();
         return;
     }
 
+    if (passwordEdit) {
+        enablePasswordPreview();
+        return;
+    }
+
+    canEdit = false;
     loginBtn.disabled = false;
     loginBtn.style.display = "inline-block";
+    showPasswordControls(true);
+    logoutBtn.disabled = false;
+    logoutBtn.style.display = "none";
     uploadBox.style.display = "none";
     gallery.innerHTML = "";
-    showMessage("Zaloguj się, aby dodawać i usuwać zdjęcia.", "info");
+    showMessage("Zaloguj się.", "info");
 
     if (unsubscribeGallery) {
         unsubscribeGallery();
@@ -298,38 +518,66 @@ function imageToBase64(file) {
     });
 }
 
-uploadBtn.addEventListener("click", async () => {
-    const file = fileInput.files[0];
+function fileToBase64(file) {
+    if (file.type.startsWith("image/")) {
+        return imageToBase64(file);
+    }
 
-    if (!auth.currentUser) {
-        showMessage("Najpierw zaloguj się przez Google.", "error");
+    if (!file.type.startsWith("video/")) {
+        return Promise.reject(new Error("Wybierz zdjęcie albo film."));
+    }
+
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = () => reject(new Error("Nie udało się odczytać pliku."));
+        reader.readAsDataURL(file);
+    });
+}
+
+uploadBtn.addEventListener("click", async () => {
+    const files = Array.from(fileInput.files);
+
+    if (!auth.currentUser && !passwordEdit) {
+        showMessage("Najpierw zaloguj się albo wpisz hasło.", "error");
         return;
     }
 
-    if (!file) {
-        showMessage("Wybierz zdjęcie do dodania.", "error");
+    if (!canEdit) {
+        showMessage("Brak uprawnień do dodawania.", "error");
+        return;
+    }
+
+    if (!files.length) {
+        showMessage("Wybierz zdjęcie albo film do dodania.", "error");
         return;
     }
 
     uploadBtn.disabled = true;
-    showMessage("Dodawanie zdjęcia...", "info");
+    showMessage(`Dodawanie plików: 0/${files.length}`, "info");
 
     try {
-        const image = await imageToBase64(file);
+        for (const [index, file] of files.entries()) {
+            const media = await fileToBase64(file);
 
-        if (image.length > 900_000) {
-            throw new Error("Zdjęcie jest za duże po kompresji. Wybierz mniejszy plik.");
+            if (media.length > 900_000) {
+                throw new Error(`${file.name} jest za duży. Wybierz mniejszy plik.`);
+            }
+
+            await addDoc(collection(db, "photos"), {
+                image: media,
+                media,
+                type: file.type.startsWith("video/") ? "video" : "image",
+                user: auth.currentUser?.displayName || auth.currentUser?.email || "Hasło",
+                uid: auth.currentUser?.uid || "password",
+                time: Date.now() + index
+            });
+
+            showMessage(`Dodawanie plików: ${index + 1}/${files.length}`, "info");
         }
 
-        await addDoc(collection(db, "photos"), {
-            image,
-            user: auth.currentUser.displayName || auth.currentUser.email,
-            uid: auth.currentUser.uid,
-            time: Date.now()
-        });
-
         fileInput.value = "";
-        showMessage("Zdjęcie dodane.", "success");
+        showMessage(files.length === 1 ? "Plik dodany." : "Pliki dodane.", "success");
     } catch (error) {
         showError(error);
     } finally {
@@ -351,51 +599,110 @@ function loadGallery() {
         }
 
         snap.forEach(photoDoc => {
-            const data = photoDoc.data();
-            const div = document.createElement("div");
-            div.className = "photo";
-
-            const img = document.createElement("img");
-            img.src = data.image;
-            img.alt = `Zdjęcie dodane przez ${data.user || "użytkownika"}`;
-            img.addEventListener("click", () => openViewer(data.image));
-
-            const meta = document.createElement("p");
-            meta.className = "photo-meta";
-            meta.textContent = data.user ? `Autor: ${data.user}` : "Autor nieznany";
-
-            const deleteBtn = document.createElement("button");
-            deleteBtn.className = "delete-btn";
-            deleteBtn.type = "button";
-            deleteBtn.textContent = "Usuń";
-            deleteBtn.addEventListener("click", async () => {
-                deleteBtn.disabled = true;
-                try {
-                    await deleteDoc(doc(db, "photos", photoDoc.id));
-                } catch (error) {
-                    showError(error);
-                    deleteBtn.disabled = false;
-                }
-            });
-
-            div.append(img, meta, deleteBtn);
-            gallery.appendChild(div);
+            gallery.appendChild(createPhotoCard(photoDoc));
         });
     }, showError);
 }
 
-function openViewer(img) {
-    viewer.classList.add("active");
-    viewerImg.src = img;
+function createPhotoCard(photoDoc) {
+    const data = photoDoc.data();
+    const div = document.createElement("div");
+    div.className = "photo";
+    div.dataset.photoId = photoDoc.id;
+
+    const mediaSrc = data.media || data.image;
+    const isVideo = data.type === "video";
+    const media = document.createElement(isVideo ? "video" : "img");
+    media.src = mediaSrc;
+
+    if (isVideo) {
+        media.controls = true;
+        media.preload = "metadata";
+    } else {
+        media.alt = `Zdjęcie dodane przez ${data.user || "użytkownika"}`;
+    }
+
+    media.addEventListener("click", () => openViewer(mediaSrc, data.type));
+
+    const meta = document.createElement("p");
+    meta.className = "photo-meta";
+    meta.textContent = data.user ? `Autor: ${data.user}` : "Autor nieznany";
+
+    div.append(media, meta);
+
+    if (canEdit) {
+        div.appendChild(createDeleteButton(photoDoc.id));
+    }
+
+    return div;
 }
 
-document.getElementById("close").addEventListener("click", () => {
+function createDeleteButton(photoId) {
+    const deleteBtn = document.createElement("button");
+    deleteBtn.className = "delete-btn";
+    deleteBtn.type = "button";
+    deleteBtn.textContent = "Usuń";
+    deleteBtn.addEventListener("click", async () => {
+        if (!canEdit) {
+            showMessage("Brak uprawnień do usuwania.", "error");
+            return;
+        }
+
+        deleteBtn.disabled = true;
+        try {
+            await deleteDoc(doc(db, "photos", photoId));
+        } catch (error) {
+            showError(error);
+            deleteBtn.disabled = false;
+        }
+    });
+
+    return deleteBtn;
+}
+
+function renderGalleryControls() {
+    gallery.querySelectorAll(".photo").forEach(photo => {
+        const existingDeleteBtn = photo.querySelector(".delete-btn");
+
+        if (!canEdit) {
+            existingDeleteBtn?.remove();
+            return;
+        }
+
+        if (!existingDeleteBtn) {
+            photo.appendChild(createDeleteButton(photo.dataset.photoId));
+        }
+    });
+}
+
+function openViewer(src, type = "image") {
+    viewer.classList.add("active");
+
+    if (type === "video") {
+        viewerImg.style.display = "none";
+        viewerVideo.style.display = "block";
+        viewerVideo.src = src;
+        return;
+    }
+
+    viewerVideo.pause();
+    viewerVideo.removeAttribute("src");
+    viewerVideo.style.display = "none";
+    viewerImg.style.display = "block";
+    viewerImg.src = src;
+}
+
+function closeViewer() {
     viewer.classList.remove("active");
-});
+    viewerVideo.pause();
+    viewerVideo.removeAttribute("src");
+}
+
+document.getElementById("close").addEventListener("click", closeViewer);
 
 viewer.addEventListener("click", e => {
     if (e.target === viewer) {
-        viewer.classList.remove("active");
+        closeViewer();
     }
 });
 </script>
