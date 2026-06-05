@@ -531,6 +531,7 @@ import {
   GoogleAuthProvider,
   signInWithPopup,
   signInWithRedirect,
+  signInAnonymously,
   signOut,
   getRedirectResult,
   getIdTokenResult,
@@ -695,7 +696,8 @@ function startPasswordSessionTimer() {
     }, SESSION_MS);
 }
 
-function enablePasswordPreview() {
+async function enablePasswordPreview() {
+    await signInForPasswordMode("preview");
     setAccess({
         preview: true,
         upload: false,
@@ -706,7 +708,8 @@ function enablePasswordPreview() {
     startPasswordSessionTimer();
 }
 
-function enableUploadMode() {
+async function enableUploadMode() {
+    await signInForPasswordMode("upload");
     setAccess({
         preview: true,
         upload: true,
@@ -716,6 +719,18 @@ function enableUploadMode() {
         type: "success"
     });
     startPasswordSessionTimer();
+}
+
+async function signInForPasswordMode(mode) {
+    if (auth.currentUser?.isAnonymous) return;
+
+    passwordMode = `pending-${mode}`;
+    try {
+        await signInAnonymously(auth);
+    } catch (error) {
+        passwordMode = null;
+        throw error;
+    }
 }
 
 function getLockUntil() {
@@ -745,7 +760,7 @@ function registerBadPassword() {
     showMessage(`Złe hasło. Pozostało prób: ${MAX_BAD_ATTEMPTS - attempts}.`, "error");
 }
 
-passwordBtn.addEventListener("click", () => {
+passwordBtn.addEventListener("click", async () => {
     const lockUntil = getLockUntil();
     if (lockUntil > Date.now()) {
         const seconds = Math.ceil((lockUntil - Date.now()) / 1000);
@@ -756,15 +771,20 @@ passwordBtn.addEventListener("click", () => {
     const value = passwordInput.value.trim();
     passwordInput.value = "";
 
-    if (value === PREVIEW_PASSWORD) {
-        clearBadAttempts();
-        enablePasswordPreview();
-        return;
-    }
-
-    if (value === UPLOAD_PASSWORD) {
-        clearBadAttempts();
-        enableUploadMode();
+    if (value === PREVIEW_PASSWORD || value === UPLOAD_PASSWORD) {
+        passwordBtn.disabled = true;
+        try {
+            clearBadAttempts();
+            if (value === PREVIEW_PASSWORD) {
+                await enablePasswordPreview();
+            } else {
+                await enableUploadMode();
+            }
+        } catch (error) {
+            showError(error);
+        } finally {
+            passwordBtn.disabled = false;
+        }
         return;
     }
 
@@ -831,10 +851,33 @@ async function startGoogleLogin() {
     }
 }
 
-getRedirectResult(auth).catch(showError);
+let completedGoogleRedirectUser = null;
+const googleRedirectResult = getRedirectResult(auth)
+    .then(result => {
+        completedGoogleRedirectUser = result?.user || null;
+        return result;
+    })
+    .catch(error => {
+        showError(error);
+        return null;
+    });
+
+function startGoogleLoginAfterRedirectCheck() {
+    googleRedirectResult.finally(() => {
+        if (!auth.currentUser && !completedGoogleRedirectUser && googleLoginRequested && !googleLoginStarted && !passwordMode) {
+            startGoogleLogin();
+        }
+    });
+}
 
 onAuthStateChanged(auth, async user => {
     if (user) {
+        if (user.isAnonymous) {
+            if (passwordMode) return;
+            showMessage("Wpisz hasło, aby dostać dostęp do galerii.", "info");
+            return;
+        }
+
         clearPasswordSessionTimer();
         showMessage("Sprawdzanie uprawnień...", "info");
         const admin = await getAdminState(user);
@@ -867,7 +910,8 @@ onAuthStateChanged(auth, async user => {
     showMessage("Wpisz hasło do podglądu albo hasło uploadu.", "info");
 
     if (googleLoginRequested && !googleLoginStarted) {
-        startGoogleLogin();
+        showMessage("Kończenie logowania Google...", "info");
+        startGoogleLoginAfterRedirectCheck();
     }
 
     if (unsubscribeGallery) {
