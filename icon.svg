@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Zdjęcia z drona">
+  <rect width="512" height="512" rx="112" fill="#050816"/>
+  <circle cx="148" cy="154" r="54" fill="#60a5fa" opacity="0.9"/>
+  <circle cx="364" cy="154" r="54" fill="#a78bfa" opacity="0.9"/>
+  <circle cx="148" cy="358" r="54" fill="#22c55e" opacity="0.9"/>
+  <circle cx="364" cy="358" r="54" fill="#f59e0b" opacity="0.9"/>
+  <path d="M156 154h200M148 162l96 92M364 162l-96 92M156 358h200M244 254l-96 96M268 254l96 96" stroke="#e2e8f0" stroke-width="26" stroke-linecap="round" opacity="0.9"/>
+  <rect x="206" y="210" width="100" height="88" rx="22" fill="#f8fafc"/>
+  <circle cx="256" cy="254" r="24" fill="#050816"/>
+</svg>

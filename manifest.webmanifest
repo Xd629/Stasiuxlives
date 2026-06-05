@@ -1,0 +1,18 @@
+{
+  "name": "Zdjęcia z drona",
+  "short_name": "Dron",
+  "description": "Prywatna galeria zdjęć i filmów z drona.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#050816",
+  "theme_color": "#050816",
+  "lang": "pl",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
